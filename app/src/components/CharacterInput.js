@@ -64,23 +64,24 @@ export default class CharacterInput extends Component {
         return (
             <div id='create'>
                 <form onSubmit={this.handleSubmit}>
-                    <label>Name:<br /><input type="text" name="name" value={this.state.name} onChange={this.handleChange} /></label><br />
-                    <label>Class:<br /><input type="text" name="class" value={this.state.class} onChange={this.handleChange} /></label><br />
-                    <label>Strength:<br /><input type="text" name="strength" value={this.state.strength} onChange={this.handleChange} /></label><br />
-                    <label>Dexterity:<br /><input type="text" name="dexterity" value={this.state.dexterity} onChange={this.handleChange} /></label><br />
-                    <label>Constitution:<br /><input type="text" name="constitution" value={this.state.constitution} onChange={this.handleChange} /></label><br />
-                    <label>Intelligence:<br /><input type="text" name="intelligence" value={this.state.intelligence} onChange={this.handleChange} /></label><br />
-                    <label>Wisdom:<br /><input type="text" name="wisdom" value={this.state.wisdom} onChange={this.handleChange} /></label><br />
-                    <label>Charisma:<br /><input type="text" name="charisma" value={this.state.charisma} onChange={this.handleChange} /></label><br />
+                    <label>Name:<br /><input type="text" name="name" value={this.state.name} onChange={this.handleChange} /></label><br /><br />
+                    <label>Class:<br /><input type="text" name="class" value={this.state.class} onChange={this.handleChange} /></label><br /><br />
+                    <label>Strength:<br /><input type="text" name="strength" value={this.state.strength} onChange={this.handleChange} /></label><br /><br />
+                    <label>Dexterity:<br /><input type="text" name="dexterity" value={this.state.dexterity} onChange={this.handleChange} /></label><br /><br />
+                    <label>Constitution:<br /><input type="text" name="constitution" value={this.state.constitution} onChange={this.handleChange} /></label><br /><br />
+                    <label>Intelligence:<br /><input type="text" name="intelligence" value={this.state.intelligence} onChange={this.handleChange} /></label><br /><br />
+                    <label>Wisdom:<br /><input type="text" name="wisdom" value={this.state.wisdom} onChange={this.handleChange} /></label><br /><br />
+                    <label>Charisma:<br /><input type="text" name="charisma" value={this.state.charisma} onChange={this.handleChange} /></label><br /><br />
                     <div>
                         <div className="row">
                             <div className="col-8">
-                                <label className="btn btn-default p-0">
+                                <label className="imageBtn">
                                     <input type="file" accept="image/*" onChange={this.selectImage} />
                                 </label>
                             </div>
                         </div>
                     </div>
+                    <br/><br/>
                     <input type="submit" value="Create" />
                     <br />
                 </form>
