@@ -1,10 +1,14 @@
+import './CharacterInput.css';
 import React, { Component } from 'react'
 import ReactDOM from "react-dom";
 import CharacterCard from './CharacterCard';
+import ImageUpload from '../services/ImageUpload';
 
 export default class CharacterInput extends Component {
     constructor(props) {
         super(props);
+        this.selectImage = this.selectImage.bind(this);
+        this.upload = this.upload.bind(this);
         this.state = {
             name: '',
             class: '',
@@ -13,7 +17,8 @@ export default class CharacterInput extends Component {
             constitution: '',
             intelligence: '',
             wisdom: '',
-            charisma: ''
+            charisma: '',
+            image: null
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -27,9 +32,21 @@ export default class CharacterInput extends Component {
         });
     }
 
+    selectImage(event) {
+        this.setState({
+            image: URL.createObjectURL(event.target.files[0])
+        });
+    }
+
+    upload() {
+        ImageUpload.upload(this.state.currentFile)
+    }
+
     handleSubmit(event) {
-        const card = ReactDOM.createRoot(document.getElementById('card'));
+        console.log(this.state.image);
+        const card = ReactDOM.createRoot(document.getElementById('create'));
         const element = <CharacterCard
+            url={this.state.image}
             name={this.state.name}
             class={this.state.class}
             strength={this.state.strength}
@@ -45,7 +62,7 @@ export default class CharacterInput extends Component {
 
     render() {
         return (
-            <div id='card'>
+            <div id='create'>
                 <form onSubmit={this.handleSubmit}>
                     <label>Name:<br /><input type="text" name="name" value={this.state.name} onChange={this.handleChange} /></label><br />
                     <label>Class:<br /><input type="text" name="class" value={this.state.class} onChange={this.handleChange} /></label><br />
@@ -54,7 +71,16 @@ export default class CharacterInput extends Component {
                     <label>Constitution:<br /><input type="text" name="constitution" value={this.state.constitution} onChange={this.handleChange} /></label><br />
                     <label>Intelligence:<br /><input type="text" name="intelligence" value={this.state.intelligence} onChange={this.handleChange} /></label><br />
                     <label>Wisdom:<br /><input type="text" name="wisdom" value={this.state.wisdom} onChange={this.handleChange} /></label><br />
-                    <label>Charisma:<br /><input type="text" name="charisma" value={this.state.charisma} onChange={this.handleChange} /></label><br /><br />
+                    <label>Charisma:<br /><input type="text" name="charisma" value={this.state.charisma} onChange={this.handleChange} /></label><br />
+                    <div>
+                        <div className="row">
+                            <div className="col-8">
+                                <label className="btn btn-default p-0">
+                                    <input type="file" accept="image/*" onChange={this.selectImage} />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     <input type="submit" value="Create" />
                     <br />
                 </form>

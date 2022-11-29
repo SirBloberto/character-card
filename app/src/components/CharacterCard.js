@@ -1,18 +1,23 @@
+import './CharacterCard.css';
 import React, { Component } from 'react'
 
 class CharacterCard extends Component {
     render() {
         return (
             <div className='card'>
-                <img src={this.props.url} alt="" width={this.props.w} height={this.props.h}></img>
-                <p>Name: {this.props.name}</p>
-                <p>Class: {this.props.class}</p>
-                <p>Strength: {this.props.strength}</p>
-                <p>Dexterity: {this.props.dexterity}</p>
-                <p>Constitution: {this.props.constitution}</p>
-                <p>Intelligence: {this.props.intelligence}</p>
-                <p>Wisdom: {this.props.wisdom}</p>
-                <p>Charisma: {this.props.charisma}</p>
+                <div id='portrait'>
+                    <img src={this.props.url} alt="" width='300' height='400'></img>
+                </div>
+                <div className='stats'>
+                    <h1>Name: {this.props.name}</h1>
+                    <h1>Class: {this.props.class}</h1>
+                    <h1>Strength: {this.props.strength}</h1>
+                    <h1>Dexterity: {this.props.dexterity}</h1>
+                    <h1>Constitution: {this.props.constitution}</h1>
+                    <h1>Intelligence: {this.props.intelligence}</h1>
+                    <h1>Wisdom: {this.props.wisdom}</h1>
+                    <h1>Charisma: {this.props.charisma}</h1>
+                </div>
             </div>
         );
     }

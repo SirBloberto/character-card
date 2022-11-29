@@ -5,7 +5,7 @@ class Main extends Component {
   render() {
   return (
     <form action='/create'>
-      <input type="submit" value="Create New Character Card" /><br />
+      <input type="submit" value="Create New Character" /><br />
     </form>
   );
 }
