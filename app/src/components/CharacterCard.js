@@ -12,7 +12,7 @@ export default function CharacterCard(props) {
     
         link.type = "text/css";
         link.rel = "stylesheet";
-        link.href = stylePath;
+        link.href = stylePath.style;
     
         head.appendChild(link);
     
@@ -20,9 +20,13 @@ export default function CharacterCard(props) {
     
     }, [stylePath]);
 
+    function onChange() {
+        setState({...stylePath, style: "b.css"})
+    }
+
     return (
         <div className='card'>
-            <button onClick={setState}>Button</button>
+            <button onClick={onChange}>Button</button>
             <div id='portrait'>
                 <img src={props.url} alt="" width='300' height='400'></img>
             </div>
