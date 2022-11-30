@@ -1,26 +1,41 @@
 import './CharacterCard.css';
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 
-class CharacterCard extends Component {
-    render() {
-        return (
-            <div className='card'>
-                <div id='portrait'>
-                    <img src={this.props.url} alt="" width='300' height='400'></img>
-                </div>
-                <div className='stats'>
-                    <h1>Name: {this.props.name}</h1>
-                    <h1>Class: {this.props.class}</h1>
-                    <h1>Strength: {this.props.strength}</h1>
-                    <h1>Dexterity: {this.props.dexterity}</h1>
-                    <h1>Constitution: {this.props.constitution}</h1>
-                    <h1>Intelligence: {this.props.intelligence}</h1>
-                    <h1>Wisdom: {this.props.wisdom}</h1>
-                    <h1>Charisma: {this.props.charisma}</h1>
-                </div>
+export default function CharacterCard(props) {
+    const [stylePath, setState] = useState({
+        style: "a.css"
+    });
+
+    useEffect(() => {
+        var head = document.head;
+        var link = document.createElement("link");
+    
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = stylePath;
+    
+        head.appendChild(link);
+    
+        return () => { head.removeChild(link); }
+    
+    }, [stylePath]);
+
+    return (
+        <div className='card'>
+            <button onClick={setState}>Button</button>
+            <div id='portrait'>
+                <img src={props.url} alt="" width='300' height='400'></img>
             </div>
-        );
-    }
+            <div className='stats'>
+                <h1>Name: {props.name}</h1>
+                <h1>Class: {props.class}</h1>
+                <h1>Strength: {props.strength}</h1>
+                <h1>Dexterity: {props.dexterity}</h1>
+                <h1>Constitution: {props.constitution}</h1>
+                <h1>Intelligence: {props.intelligence}</h1>
+                <h1>Wisdom: {props.wisdom}</h1>
+                <h1>Charisma: {props.charisma}</h1>
+            </div>
+        </div>
+    );
 }
-
-export default CharacterCard;
