@@ -24,9 +24,35 @@ export default function CharacterCard(props) {
         setState({...stylePath, style: "b.css"})
     }
 
+    function downloadJSON() {
+        let json = {
+            Name: props.name,
+            Class: props.class,
+            Strength: props.strength,
+            Dexterity: props.dexterity,
+            Constitution: props.constitution,
+            Intelligence: props.intelligence,
+            Wisdom: props.wisdom,
+            Charisma: props.charisma
+        }
+
+        const blob = new Blob([JSON.stringify(json)], {type:'text/json'})
+        const a = document.createElement('a')
+        a.download = json.Name + '-character-card.json'
+        a.href = window.URL.createObjectURL(blob)
+        const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        })
+        a.dispatchEvent(clickEvent)
+        a.remove()
+    }
+
     return (
         <div className='card'>
             <button onClick={onChange}>Button</button>
+            <button onClick={downloadJSON}>Download JSON</button>
             <div id='portrait'>
                 <img src={props.url} alt="" width='300' height='400'></img>
             </div>

@@ -1,6 +1,6 @@
 import './CharacterInput.css';
 import React, { Component } from 'react'
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import CharacterCard from './CharacterCard';
 import ImageUpload from '../services/ImageUpload';
 
@@ -43,7 +43,6 @@ export default class CharacterInput extends Component {
     }
 
     handleSubmit(event) {
-        console.log(this.state.image);
         const card = ReactDOM.createRoot(document.getElementById('create'));
         const element = <CharacterCard
             url={this.state.image}
