@@ -1,7 +1,7 @@
 import './CharacterCard.css';
 import React, { useState, useEffect } from 'react'
 import Select from 'react-select';
-import html2canvas from 'html2canvas'
+import domtoimage from 'dom-to-image'
 
 export default function CharacterCard(props) {
     const [stylePath, setState] = useState({
@@ -44,30 +44,26 @@ export default function CharacterCard(props) {
         }
 
         const blob = new Blob([JSON.stringify(json)], { type: 'text/json' })
-        const a = document.createElement('a')
-        a.download = json.Name + '-character-card.json'
-        a.href = window.URL.createObjectURL(blob)
-        const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-        })
-        a.dispatchEvent(clickEvent)
-        a.remove()
+        const link = document.createElement('a')
+        link.download = json.Name + '-character-card.json'
+        link.href = window.URL.createObjectURL(blob)
+        link.click()
+        link.remove()
     }
 
     async function downloadImage() {
         const element = document.getElementById('character-card')
-        const canvas = await html2canvas(element)
-        const data = canvas.toDataURL()
-        const link = document.createElement('a')
-
-        link.href = data;
-        link.download = 'downloaded-image.jpg';
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        domtoimage.toPng(element)
+            .then(function(dataURL) {
+                const link = document.createElement('a')
+                link.download = props.name + '-character-card.png'
+                link.href = dataURL
+                link.click();
+                link.remove()
+            }) 
+            .catch(function(error) {
+                console.log("Failed to download Character Card Image")
+            })
     }
 
     return (
