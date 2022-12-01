@@ -1,6 +1,7 @@
 import './CharacterCard.css';
 import React, { useState, useEffect } from 'react'
 import Select from 'react-select';
+import html2canvas from 'html2canvas'
 
 export default function CharacterCard(props) {
     const [stylePath, setState] = useState({
@@ -42,7 +43,7 @@ export default function CharacterCard(props) {
             Charisma: props.charisma
         }
 
-        const blob = new Blob([JSON.stringify(json)], {type:'text/json'})
+        const blob = new Blob([JSON.stringify(json)], { type: 'text/json' })
         const a = document.createElement('a')
         a.download = json.Name + '-character-card.json'
         a.href = window.URL.createObjectURL(blob)
@@ -55,29 +56,18 @@ export default function CharacterCard(props) {
         a.remove()
     }
 
-    function downloadJSON() {
-        let json = {
-            Name: props.name,
-            Class: props.class,
-            Strength: props.strength,
-            Dexterity: props.dexterity,
-            Constitution: props.constitution,
-            Intelligence: props.intelligence,
-            Wisdom: props.wisdom,
-            Charisma: props.charisma
-        }
+    async function downloadImage() {
+        const element = document.getElementById('character-card')
+        const canvas = await html2canvas(element)
+        const data = canvas.toDataURL()
+        const link = document.createElement('a')
 
-        const blob = new Blob([JSON.stringify(json)], {type:'text/json'})
-        const a = document.createElement('a')
-        a.download = json.Name + '-character-card.json'
-        a.href = window.URL.createObjectURL(blob)
-        const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-        })
-        a.dispatchEvent(clickEvent)
-        a.remove()
+        link.href = data;
+        link.download = 'downloaded-image.jpg';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     return (
@@ -92,9 +82,10 @@ export default function CharacterCard(props) {
                     isSearchable={true}
                 />
             </div>
-            <div className='card'>
-
-            <button onClick={downloadJSON}>Download JSON</button>
+            <div className='card' id='character-card'>
+                TEST
+                <button onClick={downloadJSON}>Download JSON</button>
+                <button onClick={downloadImage}>Download Image</button>
                 <div id='portrait'>
                     <img src={props.url} alt="" width='300' height='400'></img>
                 </div>
