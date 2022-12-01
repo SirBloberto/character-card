@@ -29,3 +29,9 @@ img {
     width: 200px;
     overflow: hidden;
 }
+  .dropdown-container {
+    margin: auto;
+    margin-bottom: 10px;
+    color: black;
+    width: 200px;
+  }
