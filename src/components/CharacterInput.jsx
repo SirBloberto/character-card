@@ -87,6 +87,7 @@ const CharacterInput = () => {
                 image: reader.result
             });
         }
+        //Need to make sure we select an image
         reader.readAsDataURL(event.target.files[0]);
     }
 
