@@ -1,10 +1,17 @@
 import { styled } from 'solid-styled-components';
-import Basic from '../cards/basic';
 import download from '../utilities/download';
-import save from '../utilities/save';
-import upload from '../utilities/upload';
+import save from '../utilities/save'
 import { useCard } from '../context/card';
-import { useSaved } from '../context/saved';
+import Card from './card';
+import { ChromePicker } from 'solid-color';
+
+const StyledEditor = styled.div`
+    
+`;
+
+const StyledPicker = styled.div`
+    display: flex;  
+`;
 
 const StyledButton = styled.button`
     padding: 1rem;
@@ -14,17 +21,24 @@ const StyledButton = styled.button`
 
 
 const Editor = () => {
-    const { state, style, setId, type } = useCard();
-    const { setSaved } = useSaved();
+    const { state, style, type } = useCard();
+
+    let svg = <Card/>
 
     return (
-        <>
-            <Basic/>
+        <StyledEditor>
+            <StyledPicker>            
+                <ChromePicker color={style.trim} onChange={(colour) => style.trim = colour.hex}/>
+                <ChromePicker color={style.fill} onChange={(colour) => style.fill = colour.hex}/>
+                <ChromePicker color={style.base} onChange={(colour) => style.base = colour.hex}/>
+            </StyledPicker>
 
-            <StyledButton onClick={download(state, style, type, setId )}>Download</StyledButton>
-            <StyledButton onClick={event => save(event, state, style, type, setId, setSaved )}>Save</StyledButton>
-            <StyledButton onClick={upload}>Upload</StyledButton>
-        </>
+
+            <Card ref={svg}/>
+
+            <StyledButton onClick={() => download(svg)}>Download</StyledButton>
+            <StyledButton onClick={() => save(state, style, type())}>Save</StyledButton>
+        </StyledEditor>
     );
 }
 

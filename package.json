@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "react-color": "^2.19.3",
+        "solid-color": "^0.0.4",
         "solid-js": "^1.6.10",
         "solid-styled-components": "^0.28.5"
     }

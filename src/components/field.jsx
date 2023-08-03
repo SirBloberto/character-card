@@ -1,13 +1,21 @@
+import { onMount } from 'solid-js';
 import { useCard } from '../context/card';
 
 const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
-    const { style, setState } = useCard();
+    const { style, state } = useCard();
 
     let textAnchor = align;
     if (align == "center")
-        textAnchor = "middle"
+        textAnchor = "middle";
     const textX = { "start": x, "center": x + width / 2, "end": x + width };
     const textY = y + height / 2;
+
+    onMount(() => {
+        if (!state[name])
+            state[name] = "";
+    });
+
+    //Need to workout text overflow for <text>
 
     return (
         <svg name={name} className={'field'}>
@@ -18,7 +26,7 @@ const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
                 ...text,
             }}></text>
             <foreignObject x={x} y={y} width={width} height={height} >
-                <input style={{
+                <input value={state[name]} onInput={(input) => state[name] = input.target.value} style={{
                     "border": "0",
                     "outline": "none",
                     "box-sizing": "border-box",
@@ -26,9 +34,9 @@ const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
                     "height": "100%",
                     "background-color": "#00000000",
                     "text-align": align,
-                    "fill": style.trim,
+                    "color": style.trim,
                     ...text
-                }} placeholder={placeholder} onInput={(input) => setState(name, input.target.value)} />
+                }} placeholder={placeholder} />
             </foreignObject>
         </svg>
     );
