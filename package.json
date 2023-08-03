@@ -15,6 +15,7 @@
         "vite-plugin-solid": "^2.5.0"
     },
     "dependencies": {
+        "react-color": "^2.19.3",
         "solid-js": "^1.6.10",
         "solid-styled-components": "^0.28.5"
     }
