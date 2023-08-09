@@ -50,7 +50,7 @@ const Picker = ({ name }) => {
                 <div use:clickOutside={() => setShow(false)}>
                     <StyledBlock>
                         <For each={colours}>{(colour) => 
-                            <StyledSwatch colour={colour} onClick={() => style[name] = colour}/>
+                            <StyledSwatch colour={colour} onClick={() => style[name] = colour} width={20} height={20}/>
                         }</For>
                     </StyledBlock>
                 </div>
