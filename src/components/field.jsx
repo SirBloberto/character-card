@@ -15,17 +15,15 @@ const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
             state[name] = "";
     });
 
-    //Need to workout text overflow for <text>
-
     return (
-        <svg name={name} className={'field'}>
+        <svg name={name} className={'field'} x={0} y={0} width={width + x} height={height + y}>
             <text x={textX[align]} y={textY} style={{
                 "text-anchor": textAnchor,
                 "dominant-baseline": "central",
                 "fill": style.trim,
-                ...text,
+                ...text
             }}></text>
-            <foreignObject x={x} y={y} width={width} height={height} >
+            <foreignObject x={x} y={y} width={width} height={height}>
                 <input value={state[name]} onInput={(input) => state[name] = input.target.value} style={{
                     "border": "0",
                     "outline": "none",
@@ -33,6 +31,7 @@ const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
                     "width": "100%",
                     "height": "100%",
                     "background-color": "#00000000",
+                    "vertical-align": "top",
                     "text-align": align,
                     "color": style.trim,
                     ...text

@@ -5,9 +5,7 @@ import { CARDS } from '../utilities/load';
 const Card = () => {
     const { type } = useCard();
 
-    return (
-        <Dynamic component={CARDS[type()]}/>
-    );
+    return (<Dynamic component={CARDS[type()]}/>);
 }
 
 export default Card;

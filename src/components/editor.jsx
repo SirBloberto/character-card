@@ -3,22 +3,34 @@ import download from '../utilities/download';
 import save from '../utilities/save'
 import { useCard } from '../context/card';
 import Card from './card';
-import { ChromePicker } from 'solid-color';
+import Picker from './picker';
 
 const StyledEditor = styled.div`
-    
+    position: fixed;
+    bottom: 30px;
+    left: 25%;
+    width: 940px;
 `;
 
 const StyledPicker = styled.div`
-    display: flex;  
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 1rem;
 `;
 
 const StyledButton = styled.button`
     padding: 1rem;
-    border-radius: 50px;
+    border-radius: 20px;
+    margin: auto;
     width: 200px;
 `;
 
+const StyledFooter = styled.div`
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+`;
 
 const Editor = () => {
     const { state, style, type } = useCard();
@@ -27,17 +39,18 @@ const Editor = () => {
 
     return (
         <StyledEditor>
-            <StyledPicker>            
-                <ChromePicker color={style.trim} onChange={(colour) => style.trim = colour.hex}/>
-                <ChromePicker color={style.fill} onChange={(colour) => style.fill = colour.hex}/>
-                <ChromePicker color={style.base} onChange={(colour) => style.base = colour.hex}/>
+            <StyledPicker>
+                <Picker name={'trim'}/>        
+                <Picker name={'fill'}/>
+                <Picker name={'base'}/>
             </StyledPicker>
-
 
             <Card ref={svg}/>
 
-            <StyledButton onClick={() => download(svg)}>Download</StyledButton>
-            <StyledButton onClick={() => save(state, style, type())}>Save</StyledButton>
+            <StyledFooter>
+                <StyledButton onClick={() => download(svg)}>Download</StyledButton>
+                <StyledButton onClick={() => save(state, style, type())}>Save</StyledButton>
+            </StyledFooter>
         </StyledEditor>
     );
 }

@@ -11,6 +11,7 @@ export default createGlobalStyles`
     }
 
     #root {
+        height: 100%;
         background-image: url(papyr.jpg);
     }
 `;

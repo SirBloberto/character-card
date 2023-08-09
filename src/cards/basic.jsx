@@ -16,11 +16,7 @@ const Ability = ({ name, x, y, text }) => {
                 "stroke-width": "2px",
                 "stroke": style.trim
             }} />
-            <Field name={name} x={4} y={4} width={22} height={22} align={'center'} text={{
-                "text-anchor": "middle",
-                "dominant-baseline": "central",
-                "fill": style.trim
-            }}/>
+            <Field name={name} x={4} y={4} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif",}}/>
         </g>
     );
 }
@@ -53,8 +49,9 @@ const Basic = () => {
                     "stroke-width": "2px",
                     "stroke": style.trim
                 }} />
-                <Field name={'class'} x={20} y={34} width={120} height={18} align={'start'} text={{
-                    "font-size": "0.6em"
+                <Field name={'class'} x={20} y={35.5} width={120} height={17} align={'start'} text={{
+                    "font-size": "0.6em",
+                    "font-family": "Helvetica, sans-serif"
                 }} placeholder={'Class..'}/>
             </g>
             <g mask={'url(#border)'}>
@@ -66,6 +63,7 @@ const Basic = () => {
                 <Field name={'name'} x={20} y={6} width={160} height={26} align={'start'} text={{
                     "font-size": "1.5em",
                     "font-weight": "bold",
+                    "font-family": "Helvetica, sans-serif"
                 }} placeholder={'Name..'}/>
             </g>
             <Ability name={'strength'} x={60} y={80} text={'STR'}/>
@@ -85,11 +83,7 @@ const Basic = () => {
                     "stroke-width": "1px",
                     "stroke": style.trim
                 }} />
-                <Field name={'health'} x={13} y={11.5} width={22} height={22} align={'center'} text={{
-                    "text-anchor": "middle",
-                    "dominant-baseline": "central",
-                    "fill": style.trim
-                }}/>
+                <Field name={'health'} x={13} y={11.5} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif"}}/>
             </g>
             <g transform={'translate(151 235)'}>
                 <text x={-15} y={22.5} style={{
@@ -102,11 +96,7 @@ const Basic = () => {
                     "stroke-width": "1px",
                     "stroke": style.trim
                 }} />
-                <Field name={'armor'} x={13} y={11.5} width={22} height={22} align={'center'} text={{
-                    "text-anchor": "middle",
-                    "dominant-baseline": "central",
-                    "fill": style.trim
-                }}/>
+                <Field name={'armor'} x={13} y={11.5} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif"}}/>
             </g>
             <g className='image' mask="url(#image-mask)">
                 <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{

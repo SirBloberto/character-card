@@ -12,7 +12,7 @@ const StyledMain = styled.div`
 
 const Index = () => {
     return (
-        <StyledMain id='character-card-parent'>
+        <StyledMain>
             <CardProvider>
                 <Editor/>
             </CardProvider>

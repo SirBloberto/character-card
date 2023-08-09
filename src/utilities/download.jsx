@@ -9,7 +9,11 @@ export default function download(svg) {
     const base64doc = window.btoa(svgCopy.outerHTML);
     const link = document.createElement('a');
     link.download = 'name' + '.svg';
-    link.href = 'data:image/svg+xml;base64,' + base64doc;
+    link.href = `data:image/svg+xml;base64,${base64doc}`;
     link.click();
     link.remove();
+}
+
+const handleFields = (fields) => {
+    
 }
