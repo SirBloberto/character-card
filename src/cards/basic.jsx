@@ -1,4 +1,5 @@
 import Field from '../components/field';
+import Image from '../components/image';
 import { useCard } from '../context/card';
 
 const Ability = ({ name, x, y, text }) => {
@@ -23,12 +24,6 @@ const Ability = ({ name, x, y, text }) => {
  
 const Basic = () => {
     const { style } = useCard();
-
-    const StatText = {
-        "text-anchor": "middle",
-        "dominant-baseline": "central",
-        "fill": style.trim
-    }
 
     return (
         <svg card-type='basic' viewBox={"0 0 400 300"} xmlns="http://www.w3.org/2000/svg">
@@ -109,6 +104,7 @@ const Basic = () => {
                     "stroke-width": "4px",
                     "stroke": style.trim
                 }}/>
+                <Image name={'image'} x={215} y={0} width={185} height={300}/>
             </g>
             <rect x={2.5} y={2.5} width={395} height={295} rx={20} ry={20} style={{
                 "fill": "none",

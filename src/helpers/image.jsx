@@ -1,10 +1,3 @@
-export const upload = (event) => {
-    var reader = new FileReader();
-    if (event.target.files[0])
-        reader.readAsDataURL(event.target.files[0]);
-    return reader.onloadend = () => reader.result;
-}
-
 let selectedElementDrag, offset, transformTranslate;
 export const startDrag = (event) => {
     let svg = document.getElementById('character-card');
