@@ -93,18 +93,18 @@ const Basic = () => {
                 }} />
                 <Field name={'armor'} x={13} y={11.5} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif"}}/>
             </g>
-            <g className='image' mask="url(#image-mask)">
+            <g mask="url(#image-mask)">
                 <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{
                     "fill": style.fill,
                     "stroke-width": "2px",
                     "stroke": style.trim
                 }}/>
+                <Image name={'image'} x={215} y={0} width={185} height={300}/>
                 <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{
                     "fill": "none",
                     "stroke-width": "4px",
                     "stroke": style.trim
                 }}/>
-                <Image name={'image'} x={215} y={0} width={185} height={300}/>
             </g>
             <rect x={2.5} y={2.5} width={395} height={295} rx={20} ry={20} style={{
                 "fill": "none",

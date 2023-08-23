@@ -1,7 +1,8 @@
 import { styled } from 'solid-styled-components';
-import download from '../utilities/download';
+import { downloadJSON, downloadSVG } from '../utilities/download';
 import Card from './card';
 import Picker from './picker';
+import { useCard } from '../context/card';
 
 const StyledEditor = styled.div`
     position: fixed;
@@ -31,6 +32,8 @@ const StyledFooter = styled.div`
 `;
 
 const Editor = () => {
+    const { state, style, type } = useCard();
+
     let svg = <Card/>
 
     return (
@@ -44,8 +47,8 @@ const Editor = () => {
             <Card ref={svg}/>
 
             <StyledFooter>
-                <StyledButton onClick={() => download(svg)}>Download SVG</StyledButton>
-                <StyledButton onClick={() => console.log("JSON")}>Download JSON</StyledButton>
+                <StyledButton onClick={() => downloadSVG(svg)}>Download SVG</StyledButton>
+                <StyledButton onClick={() => downloadJSON(state, style, type)}>Download JSON</StyledButton>
             </StyledFooter>
         </StyledEditor>
     );
