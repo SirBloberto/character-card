@@ -8,7 +8,7 @@ import plus from '/plus.png';
 
 const StyledCards = styled.div`
     position: absolute;
-    width: 250px;
+    width: 275px;
     height: 100%;
     left: 0;
     background-color: #444;

@@ -19,7 +19,7 @@ const StyledOuterCard = styled.div`
 `;
 
 const StyledInnerCard = styled.div`
-    width: 80%;
+    width: 225px;
     height: 100%;
 
     background-color: ${props => props.fill};
@@ -31,6 +31,7 @@ const StyledInnerCard = styled.div`
     padding-left: 1rem;
     display: flex;
     align-items: center;
+    overflow: hidden;
 
     &:hover {
         cursor: pointer;

@@ -99,7 +99,9 @@ const Basic = () => {
                     "stroke-width": "2px",
                     "stroke": style.trim
                 }}/>
-                <Image name={'image'} x={215} y={0} width={185} height={300}/>
+                <Image name={'image'} x={215} y={0} width={185} height={300}>
+                    <circle cx={300} cy={150} r={300} clipPath={'url(#border)'}/>
+                </Image>
                 <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{
                     "fill": "none",
                     "stroke-width": "4px",

@@ -1,38 +1,31 @@
 import { styled } from 'solid-styled-components';
-import { createSignal, onMount, Show, batch } from 'solid-js';
+import { createSignal, onMount, Show, batch, onCleanup } from 'solid-js';
 import cross from '/cross.png';
 import plus from '/plus.png';
 import { useCard } from '../context/card';
 import { getMousePosition, getSVGTransform, SVGMatrix } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';
 
-const StyledNew = styled.img`
+const StyledSection = styled.g`
+    cursor: grab;
+    opacity: 0;
+`;
+
+const StyledNew = styled.image`
     width: 20px;
     height: 20px;
-    display: flex;
-    margin: auto;
-    margin-top: 75%;
-    align-items: center;
 
-    &:hover {
-        cursor: pointer;
-    }
+    cursor: pointer;
 `;
 
-const StyledDelete = styled.img`
+const StyledDelete = styled.image`
     width: 15px;
     height: 15px;
-    display: flex;
-    margin: auto;
-    margin-top: 10%;
-    margin-right: 10%;
 
-    &:hover {
-        cursor: pointer;
-    }
+    cursor: pointer;
 `;
 
-const Image = ({ name, x, y, width, height }) => {
+const Image = ({ name, x, y, width, height, children }) => {
     const { state } = useCard();
     const [hover, setHover] = createSignal(false);
     const [mouseDown, setMouseDown] = createSignal(false);
@@ -50,10 +43,16 @@ const Image = ({ name, x, y, width, height }) => {
         let transformTranslate = svgRef.createSVGTransform();
         transformTranslate.setTranslate(state[name + "-matrix"][SVGMatrix.translation.x], state[name + "-matrix"][SVGMatrix.translation.y]);
         imageRef.transform.baseVal.insertItemBefore(transformTranslate, 0);
-
+        
         let transformScale = svgRef.createSVGTransform();
-        transformScale.setScale(state[name + "-matrix"][SVGMatrix.scale.x], state[name + "-matrix"][SVGMatrix.scale.y])
+        transformScale.setScale(state[name + "-matrix"][SVGMatrix.scale.x], state[name + "-matrix"][SVGMatrix.scale.y]);
         imageRef.transform.baseVal.appendItem(transformScale);
+
+        document.addEventListener('mouseup', endDrag);
+    });
+
+    onCleanup(() => {
+        document.removeEventListener('mouseup', endDrag);
     });
 
     function uploadImage() {
@@ -67,12 +66,20 @@ const Image = ({ name, x, y, width, height }) => {
             reader.onloadend = () => state[name]  = reader.result;
         }
         input.click();
-        //Cursor grab
     }
 
     function deleteImage() {
         state[name] = null;
-        //cursor normal
+        modifyMutable(state[name + "-matrix"], produce((matrix) => {
+            matrix[SVGMatrix.translation.x] = 0;
+            matrix[SVGMatrix.translation.y] = 0;
+            matrix[SVGMatrix.scale.x] = 1;
+            matrix[SVGMatrix.scale.y] = 1;
+        }));
+        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
+        transformTranslate.setTranslate(0, 0)
+        let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE);
+        transformScale.setScale(1, 1);
     }
 
     function startDrag(event) {
@@ -133,16 +140,19 @@ const Image = ({ name, x, y, width, height }) => {
     }
 
     return (
-        <svg ref={svgRef} class={'image'} x={x} y={y} width={width} height={height} hasImage={true} on:mouseenter={() => setHover(true)} on:mouseleave={() => setHover(false)}>
+        <svg ref={svgRef} class={'image'} x={x} y={y} width={width} height={height}>
             <image ref={imageRef} href={state[name]} height={height}/>
-            <foreignObject x={0} y={0} width={width} height={height} on:mousedown={startDrag} on:mouseup={endDrag} on:mouseleave={endDrag} on:mousemove={drag} on:wheel={scroll}>
+            <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
+                <StyledSection  onmousedown={startDrag} onmousemove={drag} onwheel={scroll}>
+                    {...children}
+                </StyledSection>
                 <Show when={!state[name]}>
-                    <StyledNew src={plus} onClick={uploadImage}/>
+                <StyledNew href={plus} onclick={uploadImage} x={(width - 20) / 2} y={(height - 20) / 2}/>
                 </Show>
                 <Show when={state[name] && hover()}>
-                    <StyledDelete src={cross} onClick={deleteImage}/>
+                    <StyledDelete href={cross} onclick={deleteImage} x={width - 30} y={15}/>
                 </Show>
-            </foreignObject>
+            </svg>
         </svg>
     )
 }

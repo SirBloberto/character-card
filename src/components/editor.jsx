@@ -5,10 +5,8 @@ import Picker from './picker';
 import { useCard } from '../context/card';
 
 const StyledEditor = styled.div`
-    position: fixed;
-    bottom: 30px;
-    left: 25%;
-    width: 940px;
+    margin-left: 400px;
+    width: 50%;
 `;
 
 const StyledPicker = styled.div`
