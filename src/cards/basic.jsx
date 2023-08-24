@@ -1,4 +1,5 @@
 import Field from '../components/field';
+import Image from '../components/image';
 import { useCard } from '../context/card';
 
 const Ability = ({ name, x, y, text }) => {
@@ -23,12 +24,6 @@ const Ability = ({ name, x, y, text }) => {
  
 const Basic = () => {
     const { style } = useCard();
-
-    const StatText = {
-        "text-anchor": "middle",
-        "dominant-baseline": "central",
-        "fill": style.trim
-    }
 
     return (
         <svg card-type='basic' viewBox={"0 0 400 300"} xmlns="http://www.w3.org/2000/svg">
@@ -98,12 +93,15 @@ const Basic = () => {
                 }} />
                 <Field name={'armor'} x={13} y={11.5} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif"}}/>
             </g>
-            <g className='image' mask="url(#image-mask)">
+            <g mask="url(#image-mask)">
                 <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{
                     "fill": style.fill,
                     "stroke-width": "2px",
                     "stroke": style.trim
                 }}/>
+                <Image name={'image'} x={215} y={0} width={185} height={300} size={20} newPosition={{x: (185 - 20) / 2, y: (300 - 20) / 2}} deletePosition={{x: 185 - 20 - 15, y: 15}}>
+                    <circle cx={300} cy={150} r={300} clipPath={'url(#border)'}/>
+                </Image>
                 <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{
                     "fill": "none",
                     "stroke-width": "4px",

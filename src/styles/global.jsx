@@ -4,6 +4,7 @@ export default createGlobalStyles`
     * {
         margin: 0;
         padding: 0;
+        user-select: none;
     }
 
     html, body {
@@ -12,6 +13,6 @@ export default createGlobalStyles`
 
     #root {
         height: 100%;
-        background-image: url(papyr.jpg);
+        background-image: url(papyr.webp);
     }
 `;

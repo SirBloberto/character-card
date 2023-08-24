@@ -12,7 +12,7 @@ const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
 
     onMount(() => {
         if (!state[name])
-            state[name] = "";
+            state[name] = '';
     });
 
     return (

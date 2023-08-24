@@ -1,15 +1,14 @@
 import { styled } from 'solid-styled-components';
-import download from '../utilities/download';
-import save from '../utilities/save'
-import { useCard } from '../context/card';
+import { downloadJSON, downloadSVG } from '../utilities/download';
 import Card from './card';
 import Picker from './picker';
+import { useCard } from '../context/card';
 
 const StyledEditor = styled.div`
-    position: fixed;
-    bottom: 30px;
-    left: 25%;
-    width: 940px;
+    margin: auto;
+    width: 50%;
+    min-width: 450px;
+    max-width: 950px;
 `;
 
 const StyledPicker = styled.div`
@@ -22,7 +21,7 @@ const StyledButton = styled.button`
     padding: 1rem;
     border-radius: 20px;
     margin: auto;
-    width: 200px;
+    width: 65%;
 `;
 
 const StyledFooter = styled.div`
@@ -48,8 +47,8 @@ const Editor = () => {
             <Card ref={svg}/>
 
             <StyledFooter>
-                <StyledButton onClick={() => download(svg)}>Download</StyledButton>
-                <StyledButton onClick={() => save(state, style, type())}>Save</StyledButton>
+                <StyledButton onClick={() => downloadSVG(svg)}>Download SVG</StyledButton>
+                <StyledButton onClick={() => downloadJSON(state, style, type)}>Download JSON</StyledButton>
             </StyledFooter>
         </StyledEditor>
     );
