@@ -1,7 +1,7 @@
 import { styled } from 'solid-styled-components';
 import { createSignal, onMount, Show, batch, onCleanup } from 'solid-js';
-import cross from '/cross.png';
-import plus from '/plus.png';
+import cross from '/cross.webp';
+import plus from '/plus.webp';
 import { useCard } from '../context/card';
 import { getMousePosition, getSVGTransform, SVGMatrix } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';
@@ -11,21 +11,14 @@ const StyledSection = styled.g`
     opacity: 0;
 `;
 
-const StyledNew = styled.image`
-    width: 20px;
-    height: 20px;
+const StyledIcon = styled.image`
+    width: ${props => props.size}px;
+    height: ${props => props.size}px;
 
     cursor: pointer;
 `;
 
-const StyledDelete = styled.image`
-    width: 15px;
-    height: 15px;
-
-    cursor: pointer;
-`;
-
-const Image = ({ name, x, y, width, height, children }) => {
+const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, children }) => {
     const { state } = useCard();
     const [hover, setHover] = createSignal(false);
     const [mouseDown, setMouseDown] = createSignal(false);
@@ -147,10 +140,10 @@ const Image = ({ name, x, y, width, height, children }) => {
                     {...children}
                 </StyledSection>
                 <Show when={!state[name]}>
-                <StyledNew href={plus} onclick={uploadImage} x={(width - 20) / 2} y={(height - 20) / 2}/>
+                    <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size}/>
                 </Show>
                 <Show when={state[name] && hover()}>
-                    <StyledDelete href={cross} onclick={deleteImage} x={width - 30} y={15}/>
+                    <StyledIcon href={cross} onclick={deleteImage} x={deletePosition.x} y={deletePosition.y} size={size}/>
                 </Show>
             </svg>
         </svg>

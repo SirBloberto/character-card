@@ -5,8 +5,10 @@ import Picker from './picker';
 import { useCard } from '../context/card';
 
 const StyledEditor = styled.div`
-    margin-left: 400px;
+    margin: auto;
     width: 50%;
+    min-width: 450px;
+    max-width: 950px;
 `;
 
 const StyledPicker = styled.div`
@@ -19,7 +21,7 @@ const StyledButton = styled.button`
     padding: 1rem;
     border-radius: 20px;
     margin: auto;
-    width: 200px;
+    width: 65%;
 `;
 
 const StyledFooter = styled.div`

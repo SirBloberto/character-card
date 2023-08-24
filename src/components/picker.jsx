@@ -3,10 +3,18 @@ import { createSignal, Show, createEffect } from 'solid-js';
 import clickOutside from '../helpers/click-outside';
 import { styled } from 'solid-styled-components';
 
+const StyledPicker = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 115px;
+    justify-content: end;
+    gap: 5px;
+`;
+
 const StyledSwatch = styled.button`
-    width: ${props => props.width}px;
-    height: ${props => props.height}px;
-    border-radius: 5px;
+    width: ${props => props.width}%;
+    aspect-ratio: 1;
+    border-radius: 20%;
     border: 1px solid #000;
     background: ${props => props.colour};
     margin-left: auto;
@@ -18,21 +26,13 @@ const StyledSwatch = styled.button`
     }
 `;
 
-const StyledPicker = styled.div`
-    display: block;
-    margin-top: auto;
-    margin-left: auto;
-    margin-right: auto;
-`;
-
 const StyledBlock = styled.div`
     background: #fff;
     display: grid;
-    gap: 5px;
     grid-template-columns: repeat(12, 1fr);
-    padding: 5px;
+    gap: 1px;
+    padding: 1px;
     border-radius: 5px;
-    margin: auto;
     border: solid 1px #000;
 `;
 
@@ -61,12 +61,12 @@ const Picker = ({ name }) => {
                 <div use:clickOutside={() => setShow(false)}>
                     <StyledBlock>
                         <For each={colours}>{(colour) => 
-                            <StyledSwatch colour={colour} onClick={() => style[name] = colour} width={20} height={20}/>
+                            <StyledSwatch colour={colour} onClick={() => style[name] = colour} width={100}/>
                         }</For>
                     </StyledBlock>
                 </div>
             </Show>
-            <StyledSwatch width={40} height={20} colour={style[name]} onClick={() => setShow(true)} style={{"margin-top": "0.5rem"}}/>
+            <StyledSwatch width={20} colour={style[name]} onClick={() => setShow(true)} style={{"aspect-ratio": "21 / 9", "border-radius": "8px"}}/>
         </StyledPicker>
     )
 }

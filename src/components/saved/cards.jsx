@@ -4,13 +4,12 @@ import { styled } from 'solid-styled-components';
 import SavedCard from './card';
 import { useCard } from '../../context/card';
 import { saveStatic, saveDynamic } from '../../utilities/save';
-import plus from '/plus.png';
+import plus from '/plus.webp';
 
 const StyledCards = styled.div`
-    position: absolute;
-    width: 275px;
+    min-width: 275px;
     height: 100%;
-    left: 0;
+    align-self: flex-start;
     background-color: #444;
     overflow: auto;
 `;
