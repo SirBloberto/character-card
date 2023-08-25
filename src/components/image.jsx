@@ -1,7 +1,7 @@
 import { styled } from 'solid-styled-components';
 import { createSignal, onMount, Show, batch, onCleanup } from 'solid-js';
-import cross from '/cross.webp';
-import plus from '/plus.webp';
+import cross from '../images/cross.webp';
+import plus from '../images/plus.webp';
 import { useCard } from '../context/card';
 import { getMousePosition, getSVGTransform, SVGMatrix } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';

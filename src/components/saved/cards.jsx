@@ -4,7 +4,7 @@ import { styled } from 'solid-styled-components';
 import SavedCard from './card';
 import { useCard } from '../../context/card';
 import { saveStatic, saveDynamic } from '../../utilities/save';
-import plus from '/plus.webp';
+import plus from '../../images/plus.webp';
 
 const StyledCards = styled.div`
     min-width: 275px;

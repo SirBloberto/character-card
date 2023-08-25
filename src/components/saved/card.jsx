@@ -1,7 +1,7 @@
 import { styled } from "solid-styled-components";
 import { useSaved } from '../../context/saved';
-import cross from '/cross.webp';
-import edit from '/edit.webp';
+import cross from '../../images/cross.webp';
+import edit from '../../images/edit.webp';
 import { produce } from 'solid-js/store';
 import { useCard } from "../../context/card";
 import { saveStatic, saveDynamic } from "../../utilities/save";
