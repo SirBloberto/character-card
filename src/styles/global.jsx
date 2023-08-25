@@ -1,4 +1,5 @@
 import { createGlobalStyles } from "solid-styled-components";
+import papyr from '../images/papyr.webp';
 
 export default createGlobalStyles`
     * {
@@ -13,6 +14,6 @@ export default createGlobalStyles`
 
     #root {
         height: 100%;
-        background-image: url(papyr.webp);
+        background-image: url(${papyr});
     }
 `;
