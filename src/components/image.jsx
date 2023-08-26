@@ -33,14 +33,6 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
         if (!state[name + "-matrix"])
             state[name + "-matrix"] = [1, 0, 0, 1, 0, 0];
 
-        let transformTranslate = svgRef.createSVGTransform();
-        transformTranslate.setTranslate(state[name + "-matrix"][SVGMatrix.translation.x], state[name + "-matrix"][SVGMatrix.translation.y]);
-        imageRef.transform.baseVal.insertItemBefore(transformTranslate, 0);
-        
-        let transformScale = svgRef.createSVGTransform();
-        transformScale.setScale(state[name + "-matrix"][SVGMatrix.scale.x], state[name + "-matrix"][SVGMatrix.scale.y]);
-        imageRef.transform.baseVal.appendItem(transformScale);
-
         document.addEventListener('mouseup', endDrag);
     });
 
@@ -59,6 +51,14 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
             reader.onloadend = () => state[name]  = reader.result;
         }
         input.click();
+        
+        let transformTranslate = svgRef.createSVGTransform();
+        transformTranslate.setTranslate(state[name + "-matrix"][SVGMatrix.translation.x], state[name + "-matrix"][SVGMatrix.translation.y]);
+        imageRef.transform.baseVal.insertItemBefore(transformTranslate, 0);
+        
+        let transformScale = svgRef.createSVGTransform();
+        transformScale.setScale(state[name + "-matrix"][SVGMatrix.scale.x], state[name + "-matrix"][SVGMatrix.scale.y]);
+        imageRef.transform.baseVal.appendItem(transformScale);
     }
 
     function deleteImage() {
@@ -84,7 +84,7 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
         if (!transformTranslate) {
             transformTranslate = svgRef.createSVGTransform();
             transformTranslate.setTranslate(0, 0);
-            imageRef.transform.baseVal.insertItemBefore(transform, 0);
+            imageRef.transform.baseVal.insertItemBefore(transformTranslate, 0);
         }
         batch(() => {
             setOffset('x', offset.x - transformTranslate.matrix.e);
@@ -117,9 +117,9 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
         mousePosition.x -= transformTranslate.matrix.e;
         mousePosition.y -= transformTranslate.matrix.f;
         if (!transformScale) {
-            transformScale = svg.createSVGTransform();
+            transformScale = svgRef.createSVGTransform();
             transformScale.setScale(1, 1);
-            target.transform.baseVal.appendItem(transformScale);
+            imageRef.transform.baseVal.appendItem(transformScale);
         }
         let scaleFactor = event.deltaY < 0 ? 1.1 : 0.9
         transformScale.setScale(transformScale.matrix.a * scaleFactor, transformScale.matrix.d * scaleFactor)
