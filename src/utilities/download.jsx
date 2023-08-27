@@ -3,18 +3,20 @@ import { saveStatic } from "./save";
 let name = 'character-card';
 
 export const downloadSVG = (svg) => {
-    let svgCopy = svg()()().cloneNode(true);
-    let fields = svgCopy.querySelectorAll('.field');
+    while(typeof(svg) == 'function')
+        svg = svg()
+    svg = svg.cloneNode(true);
+    let fields = svg.querySelectorAll('.field');
     for (const field of fields.values()) {
         field.querySelector('text').textContent = field.querySelector('input').value;
         field.removeChild(field.querySelector('foreignObject'));
     }
-    let images = svgCopy.querySelectorAll('.image');
+    let images = svg.querySelectorAll('.image');
     for (const image of images.values())
-        image.removeChild(image.querySelector('foreignObject'));
-    const data = `data:image/svg+xml;base64,${window.btoa(svgCopy.outerHTML)}`;
-    if (svgCopy.querySelector('[name=name]') && svgCopy.querySelector('[name=name]').textContent != '')
-        name = svgCopy.querySelector('[name=name]').textContent
+        image.removeChild(image.querySelector('svg'));
+    const data = `data:image/svg+xml;base64,${window.btoa(svg.outerHTML)}`;
+    if (svg.querySelector('[name=name]') && svg.querySelector('[name=name]').textContent != '')
+        name = svg.querySelector('[name=name]').textContent
     download(data, name, 'svg');
 }
 

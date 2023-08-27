@@ -2,10 +2,11 @@ import { styled } from "solid-styled-components";
 import { useSaved } from '../../context/saved';
 import cross from '../../images/cross.webp';
 import edit from '../../images/edit.webp';
-import { produce } from 'solid-js/store';
+import { modifyMutable, produce, reconcile } from 'solid-js/store';
 import { useCard } from "../../context/card";
 import { saveStatic, saveDynamic } from "../../utilities/save";
 import { batch, createSignal } from 'solid-js';
+import { toDefault } from "../../utilities/load";
 
 const StyledOuterCard = styled.div`
     width: 100%;
@@ -54,8 +55,6 @@ const StyledEdit = styled.img`
     height: 20px;
     display: flex;
     margin: auto;
-
-    transition: opacity 0.3s ease-out;
 `;
 
 const SavedCard = ({ card, index }) => {
@@ -68,11 +67,8 @@ const SavedCard = ({ card, index }) => {
             return;
         batch(() => {
             setCards(selected(), saveStatic(state, style, type));
-            for (const key in state)
-                state[key] = cards[index()]['state'][key];
-            style['trim'] = cards[index()]['style']['trim'];
-            style['base'] = cards[index()]['style']['base'];
-            style['fill'] = cards[index()]['style']['fill'];
+            modifyMutable(state, reconcile(cards[index()]['state']));
+            modifyMutable(style, reconcile(cards[index()]['style']));
             setSelected(index());
             setCards(index(), saveDynamic(state, style, type));
             setHover(false);
@@ -82,11 +78,12 @@ const SavedCard = ({ card, index }) => {
     const deleteCard = (index) => {
         batch(() => {
             setCards(produce((cards) => cards.splice(index(), 1)));
-            if (selected() != 0)
+            if (selected() != 0) {
                 setSelected(selected() - 1);
-            else if (cards.length == 0) {
-                for (const key in state)
-                    state[key] = '';
+                modifyMutable(state, reconcile(cards[selected()]['state']));
+                modifyMutable(style, reconcile(cards[selected()]['style']));
+            } else if (cards.length == 0) {
+                modifyMutable(state, reconcile(toDefault(state)));
                 style['trim'] = 'rgb(0, 0, 0)';
                 style['base'] = 'rgb(216, 216, 216)';
                 style['fill'] = 'rgb(150, 150, 150)';

@@ -16,14 +16,3 @@ export const getSVGTransform = (element, type) => {
     }
     return null;
 }
-
-export const SVGMatrix = {
-    translation: {
-        x: 4,
-        y: 5,
-    },
-    scale: {
-        x: 0,
-        y: 3,
-    }
-}

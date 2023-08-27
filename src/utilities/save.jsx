@@ -1,11 +1,7 @@
 export function saveStatic(state, style, type) {
     let data = {}
-    data['state'] = {}
-    for (const key in state)
-        data['state'][key] = state[key];
-    data['style'] = {}
-    for (const key in style)
-        data['style'][key] = style[key];
+    data['state'] = saveObject(state);
+    data['style'] = saveObject(style);
     data['type'] = type;
     return data;
 }
@@ -15,5 +11,16 @@ export function saveDynamic(state, style, type) {
     data['state'] = state;
     data['style'] = style;
     data['type'] = type;
+    return data;
+}
+
+function saveObject(object) {
+    let data = {};
+    for (const key in object) {
+        if (typeof(object[key]) == 'object')
+            data[key] = saveObject(object[key]);
+        else
+            data[key] = object[key];
+    }
     return data;
 }

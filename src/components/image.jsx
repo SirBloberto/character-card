@@ -3,7 +3,7 @@ import { createSignal, onMount, Show, batch, onCleanup } from 'solid-js';
 import cross from '../images/cross.webp';
 import plus from '../images/plus.webp';
 import { useCard } from '../context/card';
-import { getMousePosition, getSVGTransform, SVGMatrix } from '../helpers/image';
+import { getMousePosition, getSVGTransform } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';
 
 const StyledSection = styled.g`
@@ -28,10 +28,19 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
     let imageRef = <image/>;
 
     onMount(() => {
-        if (!state[name])
-            state[name] = null;
-        if (!state[name + "-matrix"])
-            state[name + "-matrix"] = [1, 0, 0, 1, 0, 0];
+        if (!state[name]) {
+            state[name] = {};
+            modifyMutable(state, produce((state) => {
+                state[name]['data'] = null;
+                state[name]['translation'] = {x: 0, y: 0};
+                state[name]['scale'] = {x: 1, y: 1};
+            }));
+        }
+
+        if(state[name].data) {
+            insertTranslationTransform().setTranslate(state[name].translation.x, state[name].translation.y);
+            insertScaleTransform().setScale(state[name].scale.x, state[name].scale.y);
+        }
 
         document.addEventListener('mouseup', endDrag);
     });
@@ -44,48 +53,43 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
         var input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image';
-        input.onchange = (event) => { 
+        input.onchange = (event) => {
             var reader = new FileReader();
             if (event.target.files[0])
                 reader.readAsDataURL(event.target.files[0]);
-            reader.onloadend = () => state[name]  = reader.result;
+            reader.onloadend = () => {
+                state[name].data  = reader.result
+                
+                let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE)
+                if(!transformTranslate)
+                    transformTranslate = insertTranslationTransform();
+                transformTranslate.setTranslate(state[name].translation.x, state[name].translation.y);
+                
+                let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE);
+                if(!transformScale)
+                    transformScale = insertScaleTransform();
+                transformScale.setScale(state[name].scale.x, state[name].scale.y);
+            };
         }
         input.click();
-        
-        let transformTranslate = svgRef.createSVGTransform();
-        transformTranslate.setTranslate(state[name + "-matrix"][SVGMatrix.translation.x], state[name + "-matrix"][SVGMatrix.translation.y]);
-        imageRef.transform.baseVal.insertItemBefore(transformTranslate, 0);
-        
-        let transformScale = svgRef.createSVGTransform();
-        transformScale.setScale(state[name + "-matrix"][SVGMatrix.scale.x], state[name + "-matrix"][SVGMatrix.scale.y]);
-        imageRef.transform.baseVal.appendItem(transformScale);
     }
 
     function deleteImage() {
-        state[name] = null;
-        modifyMutable(state[name + "-matrix"], produce((matrix) => {
-            matrix[SVGMatrix.translation.x] = 0;
-            matrix[SVGMatrix.translation.y] = 0;
-            matrix[SVGMatrix.scale.x] = 1;
-            matrix[SVGMatrix.scale.y] = 1;
+        state[name].data = null;
+        modifyMutable(state[name], produce((state) => {
+            state.translation.x = 0;
+            state.translation.y = 0;
+            state.scale.x = 1;
+            state.scale.y = 1;
         }));
-        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
-        transformTranslate.setTranslate(0, 0)
-        let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE);
-        transformScale.setScale(1, 1);
     }
 
     function startDrag(event) {
-        if (!state[name])
+        if (!state[name].data)
             return;
         setMouseDown(true);
         setOffset(getMousePosition(event, svgRef));
-        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
-        if (!transformTranslate) {
-            transformTranslate = svgRef.createSVGTransform();
-            transformTranslate.setTranslate(0, 0);
-            imageRef.transform.baseVal.insertItemBefore(transformTranslate, 0);
-        }
+        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE)
         batch(() => {
             setOffset('x', offset.x - transformTranslate.matrix.e);
             setOffset('y', offset.y - transformTranslate.matrix.f);
@@ -98,9 +102,9 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
         let mousePosition = getMousePosition(event, svgRef);
         let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
         transformTranslate.setTranslate(mousePosition.x - offset.x, mousePosition.y - offset.y);
-        modifyMutable(state[name + "-matrix"], produce((matrix) => {
-            matrix[SVGMatrix.translation.x] = transformTranslate.matrix.e;
-            matrix[SVGMatrix.translation.y] = transformTranslate.matrix.f;
+        modifyMutable(state[name], produce((state) => {
+            state.translation.x = transformTranslate.matrix.e;
+            state.translation.y = transformTranslate.matrix.f;
         }));
     }
 
@@ -109,40 +113,49 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
     }
 
     function scroll(event) {
-        if (!state[name])
+        if (!state[name].data)
             return;
         let mousePosition = getMousePosition(event, svgRef);
         let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
         let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE);
         mousePosition.x -= transformTranslate.matrix.e;
         mousePosition.y -= transformTranslate.matrix.f;
-        if (!transformScale) {
-            transformScale = svgRef.createSVGTransform();
-            transformScale.setScale(1, 1);
-            imageRef.transform.baseVal.appendItem(transformScale);
-        }
         let scaleFactor = event.deltaY < 0 ? 1.1 : 0.9
         transformScale.setScale(transformScale.matrix.a * scaleFactor, transformScale.matrix.d * scaleFactor)
         transformTranslate.setTranslate(transformTranslate.matrix.e + mousePosition.x * (1 - scaleFactor), transformTranslate.matrix.f + mousePosition.y * (1 - scaleFactor));
-        modifyMutable(state[name + "-matrix"], produce((matrix) => {
-            matrix[SVGMatrix.translation.x] = transformTranslate.matrix.e;
-            matrix[SVGMatrix.translation.y] = transformTranslate.matrix.f;
-            matrix[SVGMatrix.scale.x] = transformScale.matrix.a;
-            matrix[SVGMatrix.scale.y] = transformScale.matrix.d;
+        modifyMutable(state[name], produce((state) => {
+            state.translation.x = transformTranslate.matrix.e;
+            state.translation.y = transformTranslate.matrix.f;
+            state.scale.x = transformScale.matrix.a;
+            state.scale.y = transformScale.matrix.d;
         }));
+    }
+
+    function insertTranslationTransform() {
+        let transformTranslate = svgRef.createSVGTransform();
+        transformTranslate.setTranslate(state[name].translation.x, state[name].translation.y);
+        imageRef.transform.baseVal.insertItemBefore(transformTranslate, 0);
+        return transformTranslate;
+    }
+
+    function insertScaleTransform() {
+        let transformScale = svgRef.createSVGTransform();
+        transformScale.setScale(state[name].scale.x, state[name].scale.y);
+        imageRef.transform.baseVal.appendItem(transformScale);
+        return transformScale;
     }
 
     return (
         <svg ref={svgRef} class={'image'} x={x} y={y} width={width} height={height}>
-            <image ref={imageRef} href={state[name]} height={height}/>
+            <image ref={imageRef} href={state[name] ? state[name].data : null} height={height}/>
             <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
                 <StyledSection  onmousedown={startDrag} onmousemove={drag} onwheel={scroll}>
                     {...children}
                 </StyledSection>
-                <Show when={!state[name]}>
+                <Show when={state[name] && !state[name].data}>
                     <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size}/>
                 </Show>
-                <Show when={state[name] && hover()}>
+                <Show when={state[name] && state[name].data && hover()}>
                     <StyledIcon href={cross} onclick={deleteImage} x={deletePosition.x} y={deletePosition.y} size={size}/>
                 </Show>
             </svg>

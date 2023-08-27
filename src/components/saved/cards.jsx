@@ -5,6 +5,8 @@ import SavedCard from './card';
 import { useCard } from '../../context/card';
 import { saveStatic, saveDynamic } from '../../utilities/save';
 import plus from '../../images/plus.webp';
+import { modifyMutable, reconcile } from 'solid-js/store';
+import { toDefault } from '../../utilities/load';
 
 const StyledCards = styled.div`
     min-width: 275px;
@@ -55,11 +57,8 @@ const SavedCards = () => {
             for (const index in storage['cards'])
                 setCards(index, storage['cards'][index]);
             setSelected(storage['selected']);
-            for (const key in cards[selected()]['state'])
-                state[key] = cards[selected()]['state'][key];
-            style['trim'] = cards[selected()]['style']['trim'];
-            style['fill'] = cards[selected()]['style']['fill'];
-            style['base'] = cards[selected()]['style']['base'];
+            modifyMutable(state, reconcile(cards[selected()]['state']));
+            modifyMutable(style, reconcile(cards[selected()]['style']));
             setCards(selected(), saveDynamic(state, style, type));
         });
     })
@@ -67,8 +66,7 @@ const SavedCards = () => {
     function newCard() {
         batch(() => {
             setCards(selected(), saveStatic(state, style, type));
-            for (const key in state)
-                state[key] = '';
+            modifyMutable(state, reconcile(toDefault(state)));
             style['trim'] = 'rgb(0, 0, 0)';
             style['base'] = 'rgb(216, 216, 216)';
             style['fill'] = 'rgb(150, 150, 150)';
