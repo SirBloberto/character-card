@@ -17,7 +17,7 @@ export function saveDynamic(state, style, type) {
 function saveObject(object) {
     let data = {};
     for (const key in object) {
-        if (typeof(object[key]) == 'object')
+        if (typeof(object[key]) == 'object' && object[key] != null)
             data[key] = saveObject(object[key]);
         else
             data[key] = object[key];

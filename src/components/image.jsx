@@ -105,6 +105,8 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
     }
 
     function endDrag() {
+        if(!state[name].data)
+            return;
         setMouseDown(false);
         let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
         modifyMutable(state[name].translation, produce((translation) => {
