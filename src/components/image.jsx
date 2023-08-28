@@ -102,14 +102,15 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
         let mousePosition = getMousePosition(event, svgRef);
         let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
         transformTranslate.setTranslate(mousePosition.x - offset.x, mousePosition.y - offset.y);
-        modifyMutable(state[name], produce((state) => {
-            state.translation.x = transformTranslate.matrix.e;
-            state.translation.y = transformTranslate.matrix.f;
-        }));
     }
 
     function endDrag() {
         setMouseDown(false);
+        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
+        modifyMutable(state[name].translation, produce((translation) => {
+            translation.x = transformTranslate.matrix.e;
+            translation.y = transformTranslate.matrix.f;
+        }));
     }
 
     function scroll(event) {
@@ -146,7 +147,7 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
     }
 
     return (
-        <svg ref={svgRef} class={'image'} x={x} y={y} width={width} height={height}>
+        <svg ref={svgRef} class={'image'} name={name} x={x} y={y} width={width} height={height}>
             <image ref={imageRef} href={state[name] ? state[name].data : null} height={height}/>
             <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
                 <StyledSection  onmousedown={startDrag} onmousemove={drag} onwheel={scroll}>

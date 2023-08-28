@@ -47,7 +47,7 @@ const Editor = () => {
             <Card ref={svg}/>
 
             <StyledFooter>
-                <StyledButton onClick={() => downloadSVG(svg)}>Download SVG</StyledButton>
+                <StyledButton onClick={() => downloadSVG(svg, state)}>Download SVG</StyledButton>
                 <StyledButton onClick={() => downloadJSON(state, style, type)}>Download JSON</StyledButton>
             </StyledFooter>
         </StyledEditor>

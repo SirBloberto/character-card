@@ -2,7 +2,7 @@ import { saveStatic } from "./save";
 
 let name = 'character-card';
 
-export const downloadSVG = (svg) => {
+export const downloadSVG = (svg, state) => {
     while(typeof(svg) == 'function')
         svg = svg()
     svg = svg.cloneNode(true);
@@ -12,8 +12,11 @@ export const downloadSVG = (svg) => {
         field.removeChild(field.querySelector('foreignObject'));
     }
     let images = svg.querySelectorAll('.image');
-    for (const image of images.values())
+    for (const image of images.values()) {
         image.removeChild(image.querySelector('svg'));
+        let imageName = image.getAttribute('name');
+        image.querySelector('image').setAttribute("transform", `translate(${state[imageName].translation.x} ${state[imageName].translation.y}) scale(${state[imageName].scale.x} ${state[imageName].scale.y})`);
+    }
     const data = `data:image/svg+xml;base64,${window.btoa(svg.outerHTML)}`;
     if (svg.querySelector('[name=name]') && svg.querySelector('[name=name]').textContent != '')
         name = svg.querySelector('[name=name]').textContent
