@@ -24,7 +24,7 @@ const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
                 ...text
             }}></text>
             <foreignObject x={x} y={y} width={width} height={height}>
-                <input value={state[name]} onInput={(input) => state[name] = input.target.value} style={{
+                <input name={"field-" + name} value={state[name]} onInput={(input) => state[name] = input.target.value} style={{
                     "border": "0",
                     "outline": "none",
                     "box-sizing": "border-box",

@@ -17,7 +17,7 @@ const Ability = ({ name, x, y, text }) => {
                 "stroke-width": "2px",
                 "stroke": style.trim
             }} />
-            <Field name={name} x={4} y={4} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif",}}/>
+            <Field name={name} x={4} y={4} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif"}}/>
         </g>
     );
 }
@@ -28,17 +28,17 @@ const Basic = () => {
     return (
         <svg card-type='basic' viewBox={"0 0 400 300"} xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <mask id={'border'}>
+                <mask id={'basic-border'}>
                     <rect x={2.5} y={2.5} width={395} height={295} rx={20} ry={20} fill={'white'}/>
                 </mask>
-                <mask id={"image-mask"}>
-                    <circle cx={515} cy={150} r={300} fill={'white'} mask={'url(#border)'}/>
+                <mask id={"basic-image-mask"}>
+                    <circle cx={515} cy={150} r={300} fill={'white'} mask={'url(#basic-border)'}/>
                 </mask>
             </defs>
             <rect x={2.5} y={2.5} width={395} height={295} rx={20} ry={20} style={{
                 "fill": style.base
             }}/>
-            <g mask={'url(#border)'}>
+            <g mask={'url(#basic-border)'}>
                 <rect x={-10} y={34} width={155} height={20} rx={8} ry={8} style={{
                     "fill": style.fill,
                     "stroke-width": "2px",
@@ -49,7 +49,7 @@ const Basic = () => {
                     "font-family": "Helvetica, sans-serif"
                 }} placeholder={'Class..'}/>
             </g>
-            <g mask={'url(#border)'}>
+            <g mask={'url(#basic-border)'}>
                 <rect x={-10} y={4} width={200} height={30} rx={12} ry={12} style={{
                     "fill": style.fill,
                     "stroke-width": "2px",
@@ -93,16 +93,16 @@ const Basic = () => {
                 }} />
                 <Field name={'armor'} x={13} y={11.5} width={22} height={22} align={'center'} text={{"font-family": "Helvetica, sans-serif"}}/>
             </g>
-            <g mask="url(#image-mask)">
-                <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{
+            <g mask="url(#basic-image-mask)">
+                <circle cx={515} cy={150} r={300} clipPath={'url(#basic-border)'} style={{
                     "fill": style.fill,
                     "stroke-width": "2px",
                     "stroke": style.trim
                 }}/>
                 <Image name={'image'} x={215} y={0} width={185} height={300} size={20} newPosition={{x: (185 - 20) / 2, y: (300 - 20) / 2}} deletePosition={{x: 185 - 20 - 15, y: 15}}>
-                    <circle cx={300} cy={150} r={300} clipPath={'url(#border)'}/>
+                    <circle cx={300} cy={150} r={300} clipPath={'url(#basic-border)'}/>
                 </Image>
-                <circle cx={515} cy={150} r={300} clipPath={'url(#border)'} style={{
+                <circle cx={515} cy={150} r={300} clipPath={'url(#basic-border)'} style={{
                     "fill": "none",
                     "stroke-width": "4px",
                     "stroke": style.trim

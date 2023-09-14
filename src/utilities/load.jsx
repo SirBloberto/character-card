@@ -1,7 +1,9 @@
 import Basic from '../cards/basic';
+import Fashion from '../cards/fashion';
 
 export const CARDS = {
-    'basic': Basic
+    'basic': Basic,
+    'fashion': Fashion
 }
 
 export const CardType = (svg) => svg.querySelector("card-type");
@@ -16,7 +18,7 @@ export const toDefault = (state) => {
             state[key] = {
                 data: null,
                 translation: {x: 0, y: 0},
-                scale: {x: 1, y: 1}
+                scale: 1
             }
         }
     }
