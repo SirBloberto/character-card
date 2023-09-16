@@ -8,7 +8,7 @@ export const CARDS = {
 
 export const CardType = (svg) => svg.querySelector("card-type");
 
-export const toDefault = (state) => {
+export function toDefault(state) {
     for (const key in state) {
         if (typeof(state[key]) == 'string')
             state[key] = '';

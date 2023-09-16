@@ -2,7 +2,7 @@ import { saveStatic } from "./save";
 
 let name = 'character-card';
 
-export const downloadSVG = (svg, state) => {
+export function downloadSVG(svg, state) {
     while(typeof(svg) == 'function')
         svg = svg()
     svg = svg.cloneNode(true);
@@ -23,14 +23,14 @@ export const downloadSVG = (svg, state) => {
     download(data, name, 'svg');
 }
 
-export const downloadJSON = (state, style, type) => {
+export function downloadJSON(state, style, type) {
     const data = new Blob([JSON.stringify(saveStatic(state, style, type))], { type: 'text/json' });
     if (state['name'])
         name = state['name']
     download(window.URL.createObjectURL(data), name, 'json');
 }
 
-const download = (data, name, type) => {
+function download(data, name, type) {
     const link = document.createElement('a');
     link.download = `${name}.${type}`;
     link.href = data;

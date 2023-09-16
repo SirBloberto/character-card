@@ -35,7 +35,7 @@ const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
                     "text-align": align,
                     "color": style.trim,
                     ...text
-                }} placeholder={placeholder} />
+                }} placeholder={placeholder} autocomplete='off'/>
             </foreignObject>
         </svg>
     );

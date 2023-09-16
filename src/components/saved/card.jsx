@@ -85,7 +85,7 @@ const SavedCard = ({ card, index }) => {
         });
     }
 
-    const deleteCard = (index) => {
+    function deleteCard() {
         batch(() => {
             setCards(produce((cards) => cards.splice(index(), 1)));
             if (selected() != 0) {
@@ -113,7 +113,7 @@ const SavedCard = ({ card, index }) => {
                 </Show>
             </StyledInnerCard>
             <Show when={hover()}>
-                <StyledDelete src={cross} alt="delete" onClick={() => deleteCard(index)}/>
+                <StyledDelete src={cross} alt="delete" onClick={() => deleteCard()}/>
             </Show>
             <Show when={selected() == index() && !hover()}>
                 <StyledEdit src={edit} alt="edit"/>
