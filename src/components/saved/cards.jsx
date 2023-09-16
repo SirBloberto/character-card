@@ -5,15 +5,16 @@ import SavedCard from './card';
 import { useCard } from '../../context/card';
 import { saveStatic, saveDynamic } from '../../utilities/save';
 import plus from '../../images/plus.webp';
-import { modifyMutable, reconcile } from 'solid-js/store';
+import { modifyMutable, reconcile, unwrap } from 'solid-js/store';
 import { toDefault } from '../../utilities/load';
 
 const StyledCards = styled.div`
     min-width: 275px;
     height: 100%;
-    align-self: flex-start;
+    align-items: flex-start;
     background-color: #444;
     overflow: auto;
+    box-shadow: 2px 0px 5px #000;
 `;
 
 const StyledHeader = styled.h2`
@@ -33,12 +34,13 @@ const StyledNew = styled.img`
 
     &:hover {
         cursor: pointer;
+        filter: brightness(90%);
     }
 `;
 
 const SavedCards = () => {
     const { cards, setCards, selected, setSelected } = useSaved();
-    const { state, style, type } = useCard();
+    const { state, style, type, setType } = useCard();
 
     onMount(() => {
         let storage = JSON.parse(window.localStorage.getItem('character-card'));
@@ -48,7 +50,7 @@ const SavedCards = () => {
         if (!storage['cards'])
             storage['cards'] = [];
         if (storage['cards'].length == 0)
-            storage['cards'] = [saveDynamic(state, style, type)];
+            storage['cards'] = [saveStatic(state, style, type())];
 
         if (!storage['selected'])
             storage['selected'] = 0;
@@ -59,18 +61,19 @@ const SavedCards = () => {
             setSelected(storage['selected']);
             modifyMutable(state, reconcile(cards[selected()]['state']));
             modifyMutable(style, reconcile(cards[selected()]['style']));
-            setCards(selected(), saveDynamic(state, style, type));
+            setType(cards[selected()]['type']);
+            setCards(selected(), saveDynamic(state, style, type()));
         });
     })
 
     function newCard() {
         batch(() => {
-            setCards(selected(), saveStatic(state, style, type));
+            setCards(selected(), saveStatic(state, style, type()));
             modifyMutable(state, reconcile(toDefault(state)));
             style['trim'] = 'rgb(0, 0, 0)';
             style['base'] = 'rgb(216, 216, 216)';
             style['fill'] = 'rgb(150, 150, 150)';
-            setCards(cards.length, saveDynamic(state, style, type));
+            setCards(cards.length, saveDynamic(state, style, type()));
             setSelected(cards.length - 1);
         });
     }
@@ -87,7 +90,7 @@ const SavedCards = () => {
         <StyledCards>
             <StyledHeader>
                 Saved Cards
-                <StyledNew src={plus} onClick={() => newCard()}></StyledNew>
+                <StyledNew src={plus} alt="new" onClick={() => newCard()}></StyledNew>
             </StyledHeader>
             <For each={cards}>{(card, index) => 
                 <SavedCard card={card} index={index}/>

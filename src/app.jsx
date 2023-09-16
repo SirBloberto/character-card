@@ -8,8 +8,7 @@ import SavedCards from './components/saved/cards';
 const StyledMain = styled.div`
     display: flex;
     height: 100%;
-    justify-content: center;
-    align-items: center;
+    justify-items: center;
 `;
 
 const App = () => {

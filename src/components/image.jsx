@@ -5,10 +5,15 @@ import plus from '../images/plus.webp';
 import { useCard } from '../context/card';
 import { getMousePosition, getSVGTransform } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';
+import { Transition } from 'solid-transition-group';
+import FadeTransition from '../styles/fade';
 
 const StyledSection = styled.g`
-    cursor: grab;
     opacity: 0;
+
+    ${({ active }) => active && `
+        cursor: grab;
+    `}
 `;
 
 const StyledIcon = styled.image`
@@ -16,30 +21,33 @@ const StyledIcon = styled.image`
     height: ${props => props.size}px;
 
     cursor: pointer;
+    &:hover {
+        filter: brightness(90%);
+    }
 `;
 
-const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, children }) => {
+const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePosition, children }) => {
     const { state } = useCard();
     const [hover, setHover] = createSignal(false);
     const [mouseDown, setMouseDown] = createSignal(false);
-    const [offset, setOffset] = createStore({x: 0, y: 0});
+    const [offset, setOffset] = createStore({ x: 0, y: 0 });
 
-    let svgRef = <svg/>;
-    let imageRef = <image/>;
+    let svgRef = <svg />;
+    let imageRef = <image />;
 
     onMount(() => {
         if (!state[name]) {
             state[name] = {};
             modifyMutable(state, produce((state) => {
                 state[name]['data'] = null;
-                state[name]['translation'] = {x: 0, y: 0};
-                state[name]['scale'] = {x: 1, y: 1};
+                state[name]['translation'] = { x: 0, y: 0 };
+                state[name]['scale'] = 1;
             }));
         }
 
-        if(state[name].data) {
-            insertTranslationTransform().setTranslate(state[name].translation.x, state[name].translation.y);
-            insertScaleTransform().setScale(state[name].scale.x, state[name].scale.y);
+        if (state[name].data) {
+            insertTranslationTransform();
+            insertScaleTransform();
         }
 
         document.addEventListener('mouseup', endDrag);
@@ -52,44 +60,59 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
     function uploadImage() {
         var input = document.createElement('input');
         input.type = 'file';
-        input.accept = 'image';
+        input.accept = 'image/*';
         input.onchange = (event) => {
-            var reader = new FileReader();
-            if (event.target.files[0])
-                reader.readAsDataURL(event.target.files[0]);
-            reader.onloadend = () => {
-                state[name].data  = reader.result
-                
-                let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE)
-                if(!transformTranslate)
-                    transformTranslate = insertTranslationTransform();
-                transformTranslate.setTranslate(state[name].translation.x, state[name].translation.y);
-                
-                let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE);
-                if(!transformScale)
-                    transformScale = insertScaleTransform();
-                transformScale.setScale(state[name].scale.x, state[name].scale.y);
+            const image = new Image();
+            image.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = image.naturalWidth;
+                canvas.height = image.naturalHeight;
+                canvas.getContext('2d').drawImage(image, 0, 0);
+                canvas.toBlob((blob) => {
+                    const webp = new File([blob], 'image.webp', { type: blob.type });
+
+                    var reader = new FileReader();
+                    reader.readAsDataURL(webp);
+
+                    reader.onloadend = () => {
+                        modifyMutable(state[name], produce((state) => {
+                            state.data = reader.result;
+                        }));
+                        
+                        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE)
+                        if (!transformTranslate)
+                            insertTranslationTransform();
+                        else
+                            transformTranslate.setTranslate(state[name].translation.x, state[name].translation.y);
+            
+                        let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE)
+                        if (!transformScale)
+                            insertScaleTransform();
+                        else
+                            transformScale.setScale(state[name].scale, state[name].scale);
+                    }
+                }, 'image/webp');
             };
+            image.src = URL.createObjectURL(event.target.files[0]);
         }
         input.click();
     }
 
     function deleteImage() {
-        state[name].data = null;
         modifyMutable(state[name], produce((state) => {
+            state.data = null;
             state.translation.x = 0;
             state.translation.y = 0;
-            state.scale.x = 1;
-            state.scale.y = 1;
+            state.scale = 1;
         }));
     }
 
     function startDrag(event) {
-        if (!state[name].data)
+        if (!state[name].data || mouseDown())
             return;
         setMouseDown(true);
         setOffset(getMousePosition(event, svgRef));
-        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE)
+        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
         batch(() => {
             setOffset('x', offset.x - transformTranslate.matrix.e);
             setOffset('y', offset.y - transformTranslate.matrix.f);
@@ -97,15 +120,14 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
     }
 
     function drag(event) {
-        if (!mouseDown())
+        if (!state[name].data || !mouseDown())
             return;
         let mousePosition = getMousePosition(event, svgRef);
-        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
-        transformTranslate.setTranslate(mousePosition.x - offset.x, mousePosition.y - offset.y);
+        getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE).setTranslate(mousePosition.x - offset.x, mousePosition.y - offset.y);
     }
 
     function endDrag() {
-        if(!state[name].data)
+        if (!state[name].data || !mouseDown())
             return;
         setMouseDown(false);
         let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
@@ -129,8 +151,7 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
         modifyMutable(state[name], produce((state) => {
             state.translation.x = transformTranslate.matrix.e;
             state.translation.y = transformTranslate.matrix.f;
-            state.scale.x = transformScale.matrix.a;
-            state.scale.y = transformScale.matrix.d;
+            state.scale = transformScale.matrix.a;
         }));
     }
 
@@ -143,27 +164,29 @@ const Image = ({ name, x, y, width, height, size, newPosition, deletePosition, c
 
     function insertScaleTransform() {
         let transformScale = svgRef.createSVGTransform();
-        transformScale.setScale(state[name].scale.x, state[name].scale.y);
+        transformScale.setScale(state[name].scale, state[name].scale);
         imageRef.transform.baseVal.appendItem(transformScale);
         return transformScale;
     }
 
     return (
         <svg ref={svgRef} class={'image'} name={name} x={x} y={y} width={width} height={height}>
-            <image ref={imageRef} href={state[name] ? state[name].data : null} height={height}/>
+            <image ref={imageRef} href={state[name] ? state[name].data : null} height={height} alt="image" />
             <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
-                <StyledSection  onmousedown={startDrag} onmousemove={drag} onwheel={scroll}>
+                <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag} onwheel={scroll}>
                     {...children}
                 </StyledSection>
                 <Show when={state[name] && !state[name].data}>
-                    <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size}/>
+                    <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size} />
                 </Show>
-                <Show when={state[name] && state[name].data && hover()}>
-                    <StyledIcon href={cross} onclick={deleteImage} x={deletePosition.x} y={deletePosition.y} size={size}/>
-                </Show>
+                <FadeTransition>
+                    <Show when={state[name] && state[name].data && hover() && !mouseDown()}>
+                        <StyledIcon href={cross} onclick={deleteImage} x={deletePosition.x} y={deletePosition.y} size={size} />
+                    </Show>
+                </FadeTransition>
             </svg>
         </svg>
     )
 }
 
-export default Image;
+export default ImageComponent;

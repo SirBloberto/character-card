@@ -1,4 +1,4 @@
-export const getMousePosition = (event, svg) => {
+export function getMousePosition(event, svg) {
     var CTM = svg.getScreenCTM();
     return {
         x: (event.clientX - CTM.e) / CTM.a,
@@ -6,7 +6,7 @@ export const getMousePosition = (event, svg) => {
     };
 }
 
-export const getSVGTransform = (element, type) => {
+export function getSVGTransform(element, type) {
     var transforms = element.transform.baseVal;
     let transform;
     for (let i = 0; i < transforms.length; i++) {
