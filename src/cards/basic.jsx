@@ -26,7 +26,7 @@ const Basic = () => {
     const { style } = useCard();
 
     return (
-        <svg card-type='basic' viewBox={"0 0 400 300"} xmlns="http://www.w3.org/2000/svg">
+        <svg card-type='basic' viewBox={"0 0 400 300"} xmlns="http://www.w3.org/2000/svg" class="character-card">
             <defs>
                 <mask id={'basic-border'}>
                     <rect x={2.5} y={2.5} width={395} height={295} rx={20} ry={20} fill={'white'}/>

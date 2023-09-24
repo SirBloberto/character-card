@@ -21,7 +21,7 @@ const Fashion = () => {
     const { style } = useCard();
 
     return (
-        <svg card-type='fashion' viewBox={"0 0 400 300"} xmlns="http://www.w3.org/2000/svg">
+        <svg card-type='fashion' viewBox={"0 0 400 300"} xmlns="http://www.w3.org/2000/svg" class="character-card">
             <defs>
                 <mask id={"fashion-image-mask"}>
                     <rect x={19.5} y={44.5} width={191} height={191} rx={30} ry={30} fill={'white'}/>

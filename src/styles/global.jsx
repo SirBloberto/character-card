@@ -17,4 +17,8 @@ export default createGlobalStyles`
         background-image: url(${papyr});
         overflow: hidden;
     }
+
+    .character-card {
+        filter: drop-shadow(0 0 3px #000);
+    }
 `;
