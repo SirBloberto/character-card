@@ -5,7 +5,6 @@ import plus from '../images/plus.webp';
 import { useCard } from '../context/card';
 import { getMousePosition, getSVGTransform } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';
-import { Transition } from 'solid-transition-group';
 import FadeTransition from '../styles/fade';
 
 const StyledSection = styled.g`
@@ -32,8 +31,8 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
     const [mouseDown, setMouseDown] = createSignal(false);
     const [offset, setOffset] = createStore({ x: 0, y: 0 });
 
-    let svgRef = <svg />;
-    let imageRef = <image />;
+    let svgRef = <svg/>;
+    let imageRef;
 
     onMount(() => {
         if (!state[name]) {
@@ -45,10 +44,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
             }));
         }
 
-        if (state[name].data) {
-            insertTranslationTransform();
-            insertScaleTransform();
-        }
+        attachTransforms();
 
         document.addEventListener('mouseup', endDrag);
     });
@@ -155,6 +151,13 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
         }));
     }
 
+    function attachTransforms() {
+        if (imageRef && state[name] && state[name].data) {
+            insertTranslationTransform();
+            insertScaleTransform();
+        }
+    }
+
     function insertTranslationTransform() {
         let transformTranslate = svgRef.createSVGTransform();
         transformTranslate.setTranslate(state[name].translation.x, state[name].translation.y);
@@ -171,8 +174,8 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
 
     return (
         <svg ref={svgRef} class={'image'} name={name} x={x} y={y} width={width} height={height}>
-            <image ref={imageRef} href={state[name] ? state[name].data : null} height={height} alt="image" />
-            <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
+            <image ref={element => {imageRef = element; attachTransforms()}} href={state[name] ? state[name].data : null} height={height} alt="image"/>
+                <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
                 <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag} onwheel={scroll}>
                     {...children}
                 </StyledSection>
