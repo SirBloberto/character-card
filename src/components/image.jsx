@@ -46,6 +46,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
 
         attachTransforms();
 
+        children.addEventListener("wheel", (event) => scroll(event))
         document.addEventListener('mouseup', endDrag);
     });
 
@@ -176,7 +177,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
         <svg ref={svgRef} class={'image'} name={name} x={x} y={y} width={width} height={height}>
             <image ref={element => {imageRef = element; attachTransforms()}} href={state[name] ? state[name].data : null} height={height} alt="image"/>
                 <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
-                <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag} onwheel={scroll}>
+                <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag}>
                     {...children}
                 </StyledSection>
                 <Show when={state[name] && !state[name].data}>
