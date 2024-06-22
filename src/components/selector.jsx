@@ -6,7 +6,7 @@ import { useCard } from '../context/card';
 import { useSaved } from '../context/saved';
 
 const StyledSelector = styled.div`
-    margin-top: 50px;
+    margin-top: calc(15vh + 1rem);
     display: flex;
     flex-direction: column;
     width: 200px;

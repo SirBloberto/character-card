@@ -4,17 +4,25 @@ import Card from './card';
 import Picker from './picker';
 import { useCard } from '../context/card';
 import Selector from './selector';
+import { MOBILE_WIDTH } from '../styles/variables';
 
 const StyledEditor = styled.div`
     width: 90%;
-    min-width: 450px;
+    min-width: 200px;
     max-width: 950px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        gap: 0.5rem;
+    }
 `;
 
 const StyledPicker = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    margin-bottom: 1rem;
 `;
 
 const StyledButton = styled.button`
@@ -30,13 +38,23 @@ const StyledButton = styled.button`
         cursor: pointer;
         background: linear-gradient(180deg, #f88e11, #f06015);
     }
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        width: 30%;
+        padding: 0.75rem;
+        margin: 0;
+    }
 `;
 
 const StyledFooter = styled.div`
-    margin-top: 1rem;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        display: flex;
+        justify-content: center;
+    }
 `;
 
 const StyledMain = styled.div`
@@ -47,6 +65,19 @@ const StyledMain = styled.div`
     align-self: center;
     gap: 4rem;
     margin: 2rem;
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        gap: 2rem;
+    }
+`;
+
+const StyledCard = styled.div`
+    width: 100%;
+    align-self: center;
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        width: 80%;
+    }
 `;
 
 const Editor = () => {
@@ -62,9 +93,9 @@ const Editor = () => {
                     <Picker name={'fill'}/>
                     <Picker name={'base'}/>
                 </StyledPicker>
-
-                <Card ref={svg}/>
-
+                <StyledCard>
+                    <Card ref={svg}/>
+                </StyledCard>
                 <StyledFooter>
                     <StyledButton onClick={() => downloadSVG(svg, state)}>Download SVG</StyledButton>
                     <StyledButton onClick={() => downloadJSON(state, style, type)}>Download JSON</StyledButton>

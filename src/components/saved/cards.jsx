@@ -7,6 +7,7 @@ import { saveStatic, saveDynamic } from '../../utilities/save';
 import plus from '../../images/plus.webp';
 import { modifyMutable, reconcile, unwrap } from 'solid-js/store';
 import { toDefault } from '../../utilities/load';
+import { MOBILE_WIDTH } from '../../styles/variables';
 
 const StyledCards = styled.div`
     min-width: 275px;
@@ -15,6 +16,10 @@ const StyledCards = styled.div`
     background-color: #444;
     overflow: auto;
     box-shadow: 2px 0px 5px #000;
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        min-width: 225px;
+    }
 `;
 
 const StyledHeader = styled.h2`
