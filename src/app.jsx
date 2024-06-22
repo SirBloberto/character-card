@@ -20,7 +20,7 @@ const App = () => {
                     <Editor/>
                 </CardProvider>
             </SavedProvider>
-            <GlobalStyle />
+            <GlobalStyle/>
         </StyledMain>
     );
 }

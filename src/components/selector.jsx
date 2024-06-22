@@ -4,6 +4,7 @@ import { createStore, modifyMutable, reconcile } from 'solid-js/store';
 import { styled } from 'solid-styled-components';
 import { useCard } from '../context/card';
 import { useSaved } from '../context/saved';
+import { MOBILE_WIDTH } from '../styles/variables';
 
 const StyledSelector = styled.div`
     margin-top: calc(15vh + 1rem);
@@ -11,6 +12,10 @@ const StyledSelector = styled.div`
     flex-direction: column;
     width: 200px;
     gap: 1rem;
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        width: 150px;
+    }
 `;
 
 const StyledType = styled.div`
