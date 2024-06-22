@@ -93,7 +93,7 @@ const SavedCard = ({ card, index }) => {
     function deleteCard() {
         batch(() => {
             setCards(produce((cards) => cards.splice(index(), 1)));
-            if (selected() != 0) {
+            if (selected() != 0 && index() <= selected()) {
                 setSelected(selected() - 1);
                 modifyMutable(state, reconcile(cards[selected()]['state']));
                 modifyMutable(style, reconcile(cards[selected()]['style']));
