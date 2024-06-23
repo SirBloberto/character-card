@@ -78,7 +78,7 @@ const StyledCard = styled.div`
     align-self: center;
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 80%;
+        width: 75%;
     }
 `;
 
