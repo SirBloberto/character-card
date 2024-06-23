@@ -7,6 +7,8 @@ import Selector from './selector';
 import { MOBILE_WIDTH } from '../styles/variables';
 import { useSaved } from '../context/saved';
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import maximize from '../images/full-screen.webp';
+import minimize from '../images/minus.webp';
 
 const StyledMain = styled.div`
     margin: auto;
@@ -111,6 +113,8 @@ const Editor = () => {
         let main = document.getElementById("editor-main");
         let editor = document.getElementById("editor-editor");
         let card = document.getElementById("editor-card");
+        if (!main || !editor || !card)
+            return
         if(fullscreen()){
             main.classList.add("fullscreen-main");
             editor.classList.add("fullscreen-editor");
@@ -150,10 +154,10 @@ const Editor = () => {
             </StyledEditor>
             <Show when={!fullscreen()}>
                 <Selector/>
-                <StyledFullscreen src={"full-screen.webp"} onclick={() => setFullscreen(true)}/>
+                <StyledFullscreen src={maximize} onclick={() => setFullscreen(true)}/>
             </Show>
             <Show when={fullscreen() && mouseMoved()}>
-                <StyledFullscreen src={"minus.webp"} onclick={() => setFullscreen(false)}/>
+                <StyledFullscreen src={minimize} onclick={() => setFullscreen(false)}/>
             </Show>
         </StyledMain>
     );

@@ -5,6 +5,7 @@ import { CardProvider } from './context/card';
 import { SavedProvider } from './context/saved';
 import SavedCards from './components/saved/cards';
 import { onMount, createSignal, Show } from 'solid-js';
+import rotate from './images/rotate.webp';
 
 const StyledMain = styled.div`
     display: flex;
@@ -49,7 +50,7 @@ const App = () => {
             <GlobalStyle/>
             <Show when={!landscape()}>
                 <StyledRotate>
-                    <img src="rotate.webp"/>
+                    <img src={rotate}/>
                     Please rotate your device
                 </StyledRotate>
             </Show>
