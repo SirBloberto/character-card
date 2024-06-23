@@ -113,14 +113,14 @@ const Editor = () => {
         let main = document.getElementById("editor-main");
         let editor = document.getElementById("editor-editor");
         let card = document.getElementById("editor-card");
-        if (!main || !editor || !card)
-            return
         if(fullscreen()){
             main.classList.add("fullscreen-main");
             editor.classList.add("fullscreen-editor");
             card.classList.add("fullscreen-card");
         } else {
-            main.classList.remove("fullscreen");
+            if (!main || !editor || !card)
+                return
+            main.classList.remove("fullscreen-main");
             editor.classList.remove("fullscreen-editor");
             card.classList.remove("fullscreen-card");
         }
