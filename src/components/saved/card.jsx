@@ -37,6 +37,7 @@ const StyledInnerCard = styled.div`
     flex-direction: column;
     justify-content: center;
     line-height: 1;
+    white-space: nowrap;
 
     &:hover {
         cursor: pointer;

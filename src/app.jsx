@@ -10,7 +10,7 @@ import rotate from './images/rotate.webp';
 const StyledMain = styled.div`
     display: flex;
     height: 100%;
-    justify-items: center;
+    justify-content: center;
 `;
 
 const StyledRotate = styled.div`

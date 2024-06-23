@@ -14,7 +14,7 @@ const StyledSelector = styled.div`
     gap: 1rem;
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 150px;
+        width: 100px;
     }
 `;
 

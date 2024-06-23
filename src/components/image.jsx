@@ -46,6 +46,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
 
         attachTransforms();
 
+        document.onwheel = (event) => {}
         children.addEventListener("wheel", (event) => scroll(event))
         document.addEventListener('mouseup', endDrag);
     });

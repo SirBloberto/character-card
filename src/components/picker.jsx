@@ -6,7 +6,7 @@ import { styled } from 'solid-styled-components';
 const StyledPicker = styled.div`
     display: flex;
     flex-direction: column;
-    height: 15vh;
+    height: 13vh;
     justify-content: end;
     gap: 5px;
 `;

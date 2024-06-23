@@ -11,13 +11,13 @@ import maximize from '../images/full-screen.webp';
 import minimize from '../images/minus.webp';
 
 const StyledMain = styled.div`
-    margin: auto;
+    margin: 1rem auto;
     width: 100%;
     display: flex;
     justify-content: center;
     align-self: center;
     gap: 4rem;
-    margin: 2rem;
+    max-width: calc(100vh * (5/4));
 
     @media (max-width: ${MOBILE_WIDTH}px) {
         gap: 0;
@@ -58,9 +58,10 @@ const StyledButton = styled.button`
     }
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 30%;
-        padding: 0.75rem;
+        width: 35%;
+        padding: 0.5rem;
         margin: 0;
+        font-size: 0.7rem;
     }
 `;
 
@@ -93,6 +94,13 @@ const StyledFullscreen = styled.img`
 
     &:hover {
         cursor: pointer;
+    }
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
     }
 `;
 
@@ -129,7 +137,7 @@ const Editor = () => {
     function handleMouseChange() {
         setMouseMoved(true);
         clearTimeout(timer);
-        timer = setTimeout(() => {setMouseMoved(false)}, 1500);
+        timer = setTimeout(() => {setMouseMoved(false)}, 2000);
     }
 
     return (

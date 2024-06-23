@@ -26,6 +26,7 @@ export default createGlobalStyles`
     .fullscreen-main {
         height: 100%;
         margin: 0;
+        max-width: calc(100vh * (4/3));
     }
 
     .fullscreen-editor {
