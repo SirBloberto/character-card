@@ -4,7 +4,7 @@ import { createStore, modifyMutable, reconcile } from 'solid-js/store';
 import { styled } from 'solid-styled-components';
 import { useCard } from '../context/card';
 import { useSaved } from '../context/saved';
-import { MOBILE_WIDTH } from '../styles/variables';
+import { MOBILE_WIDTH, MOBILE_VERTICAL } from '../styles/variables';
 
 const StyledSelector = styled.div`
     margin-top: calc(15vh + 1rem);
@@ -14,12 +14,26 @@ const StyledSelector = styled.div`
     gap: 1rem;
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 100px;
+        width: 125px;
+    }
+
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        box-sizing: border-box;
+        flex-direction: row;
+        width: 100%;
+        height: 150px;
+        justify-content: center;
+        gap: 4rem;
+        margin: 0;
     }
 `;
 
 const StyledType = styled.div`
     cursor: pointer;
+
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        width: 200px;
+    }
 `;
 
 const Selector = () => {

@@ -4,7 +4,7 @@ import Card from './card';
 import Picker from './picker';
 import { useCard } from '../context/card';
 import Selector from './selector';
-import { MOBILE_WIDTH } from '../styles/variables';
+import { MOBILE_VERTICAL, MOBILE_WIDTH } from '../styles/variables';
 import { useSaved } from '../context/saved';
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import maximize from '../images/full-screen.webp';
@@ -12,15 +12,24 @@ import minimize from '../images/minus.webp';
 
 const StyledMain = styled.div`
     margin: 1rem auto;
+    padding: 1rem;
     width: 100%;
     display: flex;
     justify-content: center;
     align-self: center;
     gap: 4rem;
     max-width: calc(100vh * (5/4));
+    box-sizing: border-box;
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        gap: 0;
+        gap: 1rem;
+    }
+
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        flex-direction: column-reverse;
+        align-self: start;
+        margin-top: 5rem;
+        max-width: 100%;
     }
 `;
 
@@ -33,8 +42,8 @@ const StyledEditor = styled.div`
     gap: 1rem;
     justify-content: center;
 
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        gap: 0.5rem;
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        width: 100%;
     }
 `;
 
@@ -79,10 +88,6 @@ const StyledFooter = styled.div`
 const StyledCard = styled.div`
     width: 100%;
     align-self: center;
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 75%;
-    }
 `;
 
 const StyledFullscreen = styled.img`
@@ -115,6 +120,10 @@ const Editor = () => {
     onMount(() => {
         document.onmousemove = () => handleMouseChange();
         document.onmousedown = () => handleMouseChange();
+        document.onfullscreenchange = () => {
+            if (!document.fullscreenElement)
+                setFullscreen(false);
+        }
     });
 
     createEffect(() => {
@@ -122,12 +131,15 @@ const Editor = () => {
         let editor = document.getElementById("editor-editor");
         let card = document.getElementById("editor-card");
         if(fullscreen()){
+            document.getElementById("root").requestFullscreen();
             main.classList.add("fullscreen-main");
             editor.classList.add("fullscreen-editor");
             card.classList.add("fullscreen-card");
         } else {
             if (!main || !editor || !card)
                 return
+            if (document.fullscreenElement)
+                document.exitFullscreen();
             main.classList.remove("fullscreen-main");
             editor.classList.remove("fullscreen-editor");
             card.classList.remove("fullscreen-card");

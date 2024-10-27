@@ -5,9 +5,9 @@ import SavedCard from './card';
 import { useCard } from '../../context/card';
 import { saveStatic, saveDynamic } from '../../utilities/save';
 import plus from '../../images/plus.webp';
-import { modifyMutable, reconcile, unwrap } from 'solid-js/store';
+import { modifyMutable, reconcile } from 'solid-js/store';
 import { toDefault } from '../../utilities/load';
-import { MOBILE_WIDTH } from '../../styles/variables';
+import { MOBILE_WIDTH, MOBILE_VERTICAL } from '../../styles/variables';
 
 const StyledCards = styled.div`
     min-width: 275px;
@@ -19,6 +19,10 @@ const StyledCards = styled.div`
 
     @media (max-width: ${MOBILE_WIDTH}px) {
         min-width: 225px;
+    }
+
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        display: none;
     }
 `;
 
@@ -44,9 +48,9 @@ const StyledNew = styled.img`
 `;
 
 const SavedCards = () => {
-    const { cards, setCards, selected, setSelected, fullscreen } = useSaved();
+    const { cards, setCards, selected, setSelected, fullscreen, landscape } = useSaved();
     const { state, style, type, setType } = useCard();
-
+    
     onMount(() => {
         let storage = JSON.parse(window.localStorage.getItem('character-card'));
 
@@ -93,15 +97,17 @@ const SavedCards = () => {
 
     return (
         <Show when={!fullscreen()}>
-            <StyledCards>
-                <StyledHeader>
-                    Saved Cards
-                    <StyledNew src={plus} alt="new" onClick={() => newCard()}></StyledNew>
-                </StyledHeader>
-                <For each={cards}>{(card, index) => 
-                    <SavedCard card={card} index={index}/>
-                }</For>
-            </StyledCards>
+            <Show when={landscape()}>
+                <StyledCards>
+                    <StyledHeader>
+                        Saved Cards
+                        <StyledNew src={plus} alt="new" onClick={() => newCard()}></StyledNew>
+                    </StyledHeader>
+                    <For each={cards}>{(card, index) => 
+                        <SavedCard card={card} index={index}/>
+                    }</For>
+                </StyledCards>
+            </Show>
         </Show>
     );
 }
