@@ -46,13 +46,14 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
 
         attachTransforms();
 
-        document.onwheel = (event) => {}
-        children.addEventListener("wheel", (event) => scroll(event))
+        children.addEventListener("wheel", (event) => scroll(event), {passive: true});
         document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
     });
 
     onCleanup(() => {
         document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('touchend', endDrag);
     });
 
     function uploadImage() {
@@ -178,7 +179,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
         <svg ref={svgRef} class={'image'} name={name} x={x} y={y} width={width} height={height}>
             <image ref={element => {imageRef = element; attachTransforms()}} href={state[name] ? state[name].data : null} height={height} alt="image"/>
                 <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
-                <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag}>
+                <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag} ontouchstart={startDrag} ontouchmove={drag}>
                     {...children}
                 </StyledSection>
                 <Show when={state[name] && !state[name].data}>

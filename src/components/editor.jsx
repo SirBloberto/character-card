@@ -28,7 +28,7 @@ const StyledMain = styled.div`
     @media (max-width: ${MOBILE_VERTICAL}px) {
         flex-direction: column-reverse;
         align-self: start;
-        margin-top: 5rem;
+        margin-top: 4rem;
         max-width: 100%;
     }
 `;
@@ -50,6 +50,13 @@ const StyledEditor = styled.div`
 const StyledPicker = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 4fr 1fr;
+    height: 13vh;
+    row-gap: 0.5rem;
+
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        height: 32vw;
+    }
 `;
 
 const StyledButton = styled.button`
@@ -71,6 +78,13 @@ const StyledButton = styled.button`
         padding: 0.5rem;
         margin: 0;
         font-size: 0.7rem;
+    }
+
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        width: 45%;
+        padding: 0.75rem;
+        margin: 0;
+        font-size: 0.9rem;
     }
 `;
 
@@ -135,6 +149,7 @@ const Editor = () => {
             main.classList.add("fullscreen-main");
             editor.classList.add("fullscreen-editor");
             card.classList.add("fullscreen-card");
+            screen.orientation.lock('landscape').catch(e => {}); //Ignore if we are on desktop
         } else {
             if (!main || !editor || !card)
                 return
@@ -143,6 +158,7 @@ const Editor = () => {
             main.classList.remove("fullscreen-main");
             editor.classList.remove("fullscreen-editor");
             card.classList.remove("fullscreen-card");
+            screen.orientation.unlock();
         }
     });
 
@@ -157,9 +173,9 @@ const Editor = () => {
             <StyledEditor id="editor-editor">
                 <Show when={!fullscreen()}>
                     <StyledPicker>
-                        <Picker name={'trim'}/>        
-                        <Picker name={'fill'}/>
-                        <Picker name={'base'}/>
+                        <Picker id={1} name={'trim'}/>        
+                        <Picker id={2} name={'fill'}/>
+                        <Picker id={3} name={'base'}/>
                     </StyledPicker>
                 </Show>
                 <StyledCard id="editor-card">

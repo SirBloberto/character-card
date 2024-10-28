@@ -1,5 +1,5 @@
 import { useSaved } from '../../context/saved';
-import { onMount, For, createEffect, batch, Show } from 'solid-js';
+import { onMount, For, createEffect, batch, Show, createSignal } from 'solid-js';
 import { styled } from 'solid-styled-components';
 import SavedCard from './card';
 import { useCard } from '../../context/card';
@@ -48,8 +48,10 @@ const StyledNew = styled.img`
 `;
 
 const SavedCards = () => {
-    const { cards, setCards, selected, setSelected, fullscreen, landscape } = useSaved();
+    const { cards, setCards, selected, setSelected, fullscreen } = useSaved();
     const { state, style, type, setType } = useCard();
+    const [vertical, setVertical] = createSignal(false);
+    const [open, setOpen] = createSignal(false);
     
     onMount(() => {
         let storage = JSON.parse(window.localStorage.getItem('character-card'));
@@ -97,17 +99,15 @@ const SavedCards = () => {
 
     return (
         <Show when={!fullscreen()}>
-            <Show when={landscape()}>
-                <StyledCards>
-                    <StyledHeader>
-                        Saved Cards
-                        <StyledNew src={plus} alt="new" onClick={() => newCard()}></StyledNew>
-                    </StyledHeader>
-                    <For each={cards}>{(card, index) => 
-                        <SavedCard card={card} index={index}/>
-                    }</For>
-                </StyledCards>
-            </Show>
+            <StyledCards>
+                <StyledHeader>
+                    Saved Cards
+                    <StyledNew src={plus} alt="new" onClick={() => newCard()}></StyledNew>
+                </StyledHeader>
+                <For each={cards}>{(card, index) => 
+                    <SavedCard card={card} index={index}/>
+                }</For>
+            </StyledCards>
         </Show>
     );
 }

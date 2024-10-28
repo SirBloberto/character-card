@@ -1,15 +1,8 @@
 import { useCard } from '../context/card';
-import { createSignal, Show, createEffect } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
 import clickOutside from '../helpers/click-outside';
-import { styled } from 'solid-styled-components';
-
-const StyledPicker = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 13vh;
-    justify-content: end;
-    gap: 5px;
-`;
+import { styled, css } from 'solid-styled-components';
+import { MOBILE_VERTICAL } from '../styles/variables';
 
 const StyledSwatch = styled.button`
     width: ${props => props.width}%;
@@ -23,6 +16,31 @@ const StyledSwatch = styled.button`
 
     &:hover {
         cursor: pointer;
+    }
+`;
+
+const StyledButton = css`
+    aspect-ratio: 21 / 9;
+    border-radius: 8px;
+    grid-row: 2;
+    align-self: end;
+
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        height: 90%;
+        width: auto;
+        border-radius: 20px;
+    }
+`;
+
+const StyledBlockContainer = css`
+    align-self: end;
+    
+    @media (max-width: ${MOBILE_VERTICAL}px) {
+        grid-column: 1 / 4 !important;
+        justify-content: center;
+        width: 90%;
+        align-self: center;
+        margin: auto;
     }
 `;
 
@@ -51,14 +69,14 @@ const colours = [
     '#0062B1','#653294','#AB149E',
 ]
 
-const Picker = ({ name }) => {
+const Picker = ({ id, name }) => {
     const { style } = useCard();
     const [show, setShow] = createSignal(false);
 
     return (
-        <StyledPicker>
+        <>
             <Show when={show()}>
-                <div use:clickOutside={() => setShow(false)}>
+                <div use:clickOutside={() => setShow(false)} class={StyledBlockContainer} style={{"grid-column": id}}>
                     <StyledBlock>
                         <For each={colours}>{(colour) => 
                             <StyledSwatch colour={colour} onClick={() => style[name] = colour} width={100}/>
@@ -66,8 +84,9 @@ const Picker = ({ name }) => {
                     </StyledBlock>
                 </div>
             </Show>
-            <StyledSwatch width={20} colour={style[name]} onClick={() => setShow(true)} style={{"aspect-ratio": "21 / 9", "border-radius": "8px"}}/>
-        </StyledPicker>
+            {/* Little Block showing active */}
+            <StyledSwatch width={20} colour={style[name]} onClick={() => setShow(true)} class={StyledButton}/>
+        </>
     )
 }
 
