@@ -54,7 +54,7 @@ const StyledPicker = styled.div`
     height: 13vh;
     row-gap: 0.5rem;
 
-    @media (max-width: ${MOBILE_VERTICAL}px) {
+    @media (max-width: ${MOBILE_WIDTH}px) {
         height: 32vw;
     }
 `;
@@ -74,17 +74,9 @@ const StyledButton = styled.button`
     }
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 35%;
-        padding: 0.5rem;
-        margin: 0;
-        font-size: 0.7rem;
-    }
-
-    @media (max-width: ${MOBILE_VERTICAL}px) {
         width: 45%;
         padding: 0.75rem;
         margin: 0;
-        font-size: 0.9rem;
     }
 `;
 
@@ -148,7 +140,6 @@ const Editor = () => {
             document.getElementById("root").requestFullscreen();
             main.classList.add("fullscreen-main");
             editor.classList.add("fullscreen-editor");
-            card.classList.add("fullscreen-card");
             screen.orientation.lock('landscape').catch(e => {}); //Ignore if we are on desktop
         } else {
             if (!main || !editor || !card)
@@ -157,7 +148,6 @@ const Editor = () => {
                 document.exitFullscreen();
             main.classList.remove("fullscreen-main");
             editor.classList.remove("fullscreen-editor");
-            card.classList.remove("fullscreen-card");
             screen.orientation.unlock();
         }
     });

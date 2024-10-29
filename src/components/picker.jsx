@@ -2,7 +2,7 @@ import { useCard } from '../context/card';
 import { createSignal, Show } from 'solid-js';
 import clickOutside from '../helpers/click-outside';
 import { styled, css } from 'solid-styled-components';
-import { MOBILE_VERTICAL } from '../styles/variables';
+import { MOBILE_WIDTH, MOBILE_VERTICAL } from '../styles/variables';
 
 const StyledSwatch = styled.button`
     width: ${props => props.width}%;
@@ -25,8 +25,14 @@ const StyledButton = css`
     grid-row: 2;
     align-self: end;
 
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        height: 50%;
+        width: auto;
+        border-radius: 20px;
+    }
+
     @media (max-width: ${MOBILE_VERTICAL}px) {
-        height: 90%;
+        height: 75%;
         width: auto;
         border-radius: 20px;
     }
@@ -35,12 +41,11 @@ const StyledButton = css`
 const StyledBlockContainer = css`
     align-self: end;
     
-    @media (max-width: ${MOBILE_VERTICAL}px) {
+    @media (max-width: ${MOBILE_WIDTH}px) {
         grid-column: 1 / 4 !important;
-        justify-content: center;
         width: 90%;
-        align-self: center;
         margin: auto;
+        margin-bottom: 0;
     }
 `;
 
@@ -52,6 +57,27 @@ const StyledBlock = styled.div`
     padding: 1px;
     border-radius: 5px;
     border: solid 1px #000;
+`;
+
+const StyledSelector = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    grid-row: 2;
+    justify-content: end;
+`;
+
+const StyledSelected = styled.div`
+    display: none;
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        display: block;
+        background-color: #000;
+        height: 6px;
+        width: 25%;
+        align-self: center;
+        border-radius: 5px;
+    }
 `;
 
 const colours = [
@@ -84,8 +110,12 @@ const Picker = ({ id, name }) => {
                     </StyledBlock>
                 </div>
             </Show>
-            {/* Little Block showing active */}
-            <StyledSwatch width={20} colour={style[name]} onClick={() => setShow(true)} class={StyledButton}/>
+            <StyledSelector style={{"grid-column": id}}>
+                <Show when={show()}>
+                    <StyledSelected/>
+                </Show>
+                <StyledSwatch width={20} colour={style[name]} onClick={() => setShow(true)} class={StyledButton}/>
+            </StyledSelector>
         </>
     )
 }

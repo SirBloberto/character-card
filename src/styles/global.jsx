@@ -1,6 +1,5 @@
 import { createGlobalStyles } from "solid-styled-components";
 import papyr from '../images/papyr.webp';
-import { MOBILE_WIDTH } from "./variables";
 
 export default createGlobalStyles`
     * {
@@ -34,11 +33,5 @@ export default createGlobalStyles`
         height: 100vh;
         width: 100%;
         max-width: calc(100vh * (4/3));
-    }
-
-    .fullscreen-card {
-        @media (max-width: ${MOBILE_WIDTH}px) {
-            width: 100%;
-        }
     }
 `;

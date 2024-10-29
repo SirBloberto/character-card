@@ -1,6 +1,6 @@
 import { For, onMount, batch } from 'solid-js';
 import { CARDS } from '../utilities/load';
-import { createStore, modifyMutable, reconcile } from 'solid-js/store';
+import { createStore, reconcile } from 'solid-js/store';
 import { styled } from 'solid-styled-components';
 import { useCard } from '../context/card';
 import { useSaved } from '../context/saved';
@@ -15,6 +15,7 @@ const StyledSelector = styled.div`
 
     @media (max-width: ${MOBILE_WIDTH}px) {
         width: 125px;
+        margin-top: calc(32vw + 1rem);
     }
 
     @media (max-width: ${MOBILE_VERTICAL}px) {
