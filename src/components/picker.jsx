@@ -32,7 +32,7 @@ const StyledButton = css`
     }
 
     @media (max-width: ${MOBILE_VERTICAL}px) {
-        height: 75%;
+        height: 65%;
         width: auto;
         border-radius: 20px;
     }
@@ -62,7 +62,7 @@ const StyledBlock = styled.div`
 const StyledSelector = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
     grid-row: 2;
     justify-content: end;
 `;
@@ -73,7 +73,7 @@ const StyledSelected = styled.div`
     @media (max-width: ${MOBILE_WIDTH}px) {
         display: block;
         background-color: #000;
-        height: 6px;
+        height: 5px;
         width: 25%;
         align-self: center;
         border-radius: 5px;
