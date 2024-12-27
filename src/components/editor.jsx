@@ -141,6 +141,10 @@ const Editor = () => {
             main.classList.add("fullscreen-main");
             editor.classList.add("fullscreen-editor");
             screen.orientation.lock('landscape').catch(e => {}); //Ignore if we are on desktop
+            //If on mobile
+            let input = editor.querySelectorAll("input");
+            for (let i = 0; i < input.length; i++)
+                input[i].disabled = true;
         } else {
             if (!main || !editor || !card)
                 return
@@ -149,6 +153,10 @@ const Editor = () => {
             main.classList.remove("fullscreen-main");
             editor.classList.remove("fullscreen-editor");
             screen.orientation.unlock();
+            //If on mobile
+            let input = editor.querySelectorAll("input");
+            for (let i = 0; i < input.length; i++)
+                input[i].disabled = false;
         }
     });
 

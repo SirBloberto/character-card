@@ -1,4 +1,4 @@
-import { styled } from 'solid-styled-components';
+import { styled, css } from 'solid-styled-components';
 import { createSignal, onMount, Show, batch, onCleanup } from 'solid-js';
 import cross from '../images/cross.webp';
 import plus from '../images/plus.webp';
@@ -25,6 +25,14 @@ const StyledIcon = styled.image`
     }
 `;
 
+const StyledSlider = css`
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 20;
+    writing-mode: vertical-lr;
+`;
+
 const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePosition, children }) => {
     const { state } = useCard();
     const [hover, setHover] = createSignal(false);
@@ -48,10 +56,12 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
 
         children.addEventListener("wheel", (event) => scroll(event), {passive: true});
         document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
     });
 
     onCleanup(() => {
         document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('touchend', endDrag);
     });
 
     function uploadImage() {
@@ -107,6 +117,8 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
     function startDrag(event) {
         if (!state[name].data || mouseDown())
             return;
+        if (event instanceof TouchEvent)
+            event = event.touches[0];
         setMouseDown(true);
         setOffset(getMousePosition(event, svgRef));
         let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
@@ -119,6 +131,8 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
     function drag(event) {
         if (!state[name].data || !mouseDown())
             return;
+        if (event instanceof TouchEvent)
+            event = event.touches[0];
         let mousePosition = getMousePosition(event, svgRef);
         getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE).setTranslate(mousePosition.x - offset.x, mousePosition.y - offset.y);
     }
@@ -132,6 +146,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
             translation.x = transformTranslate.matrix.e;
             translation.y = transformTranslate.matrix.f;
         }));
+        //Modify the children
     }
 
     function scroll(event) {
@@ -173,21 +188,27 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
         return transformScale;
     }
 
+    //Add slider for size
+
     return (
         <svg ref={svgRef} class={'image'} name={name} x={x} y={y} width={width} height={height}>
             <image ref={element => {imageRef = element; attachTransforms()}} href={state[name] ? state[name].data : null} height={height} alt="image"/>
                 <svg onmouseenter={() => setHover(true)} onmouseleave={() => setHover(false)}>
-                <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag}>
+                <StyledSection active={state[name] && state[name].data} onmousedown={startDrag} onmousemove={drag} ontouchstart={startDrag} ontouchmove={drag}>
                     {...children}
                 </StyledSection>
                 <Show when={state[name] && !state[name].data}>
-                    <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size} />
+                    <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size}/>
                 </Show>
                 <FadeTransition>
+                    {/* Should always be active on mobile */}
                     <Show when={state[name] && state[name].data && hover() && !mouseDown()}>
-                        <StyledIcon href={cross} onclick={deleteImage} x={deletePosition.x} y={deletePosition.y} size={size} />
+                        <StyledIcon href={cross} onclick={deleteImage} x={deletePosition.x} y={deletePosition.y} size={size}/>
                     </Show>
                 </FadeTransition>
+                <foreignObject x={deletePosition.x} y={deletePosition.y + 25} width={size} height="125">
+                    <input type="range" min="1" max="10" value="1" step="0.1" class={StyledSlider} onrangechange={console.log("ASD")}/>
+                </foreignObject>
             </svg>
         </svg>
     )

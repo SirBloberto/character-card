@@ -96,6 +96,7 @@ const SavedCards = () => {
         data = JSON.stringify(data);
         window.localStorage.setItem('character-card', data);
     });
+    //Need to add burger menu for cards on mobile
 
     return (
         <Show when={!fullscreen()}>
