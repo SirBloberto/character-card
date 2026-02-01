@@ -1,5 +1,6 @@
 import { styled } from 'solid-styled-components';
-import { downloadJSON, downloadSVG } from '../utilities/download';
+import { downloadSVG } from '../utilities/download';
+import { render } from 'solid-js/web';
 import Card from './card';
 import Picker from './picker';
 import { useCard } from '../context/card';
@@ -9,6 +10,7 @@ import { useSaved } from '../context/saved';
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import maximize from '../images/full-screen.webp';
 import minimize from '../images/minus.webp';
+import Share from './share';
 
 const StyledMain = styled.div`
     margin: 1rem auto;
@@ -63,7 +65,7 @@ const StyledButton = styled.button`
     padding: 1rem;
     border-radius: 20px;
     margin: auto;
-    width: 65%;
+    width: 45%;
     border: solid 1px #da7c0c;
     background: linear-gradient(180deg, #faa51a, #f47a20);
     box-shadow: 0px 2px 5px #cc7000;
@@ -74,20 +76,8 @@ const StyledButton = styled.button`
     }
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 45%;
         padding: 0.75rem;
         margin: 0;
-    }
-`;
-
-const StyledFooter = styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        display: flex;
-        justify-content: center;
     }
 `;
 
@@ -180,18 +170,15 @@ const Editor = () => {
                     <Card ref={svg}/>
                 </StyledCard>
                 <Show when={!fullscreen()}>
-                    <StyledFooter>
-                        <StyledButton onClick={() => downloadSVG(svg, state)}>Download SVG</StyledButton>
-                        <StyledButton onClick={() => downloadJSON(state, style, type)}>Download JSON</StyledButton>
-                    </StyledFooter>
+                    <StyledButton class="button" onClick={() => downloadSVG(svg, state)}>Download SVG</StyledButton>
                 </Show>
             </StyledEditor>
             <Show when={!fullscreen()}>
                 <Selector/>
-                <StyledFullscreen src={maximize} onclick={() => setFullscreen(true)}/>
+                <StyledFullscreen src={maximize} onclick={() => setFullscreen(true)} alt="maximize"/>
             </Show>
             <Show when={fullscreen() && mouseMoved()}>
-                <StyledFullscreen src={minimize} onclick={() => setFullscreen(false)}/>
+                <StyledFullscreen src={minimize} onclick={() => setFullscreen(false)} alt="minimize"/>
             </Show>
         </StyledMain>
     );

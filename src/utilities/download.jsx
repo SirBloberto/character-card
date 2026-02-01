@@ -1,5 +1,3 @@
-import { saveStatic } from "./save";
-
 let name = 'character-card';
 
 export function downloadSVG(svg, state) {
@@ -20,17 +18,6 @@ export function downloadSVG(svg, state) {
     const data = `data:image/svg+xml;base64,${window.btoa(svg.outerHTML)}`;
     if (svg.querySelector('[name=name]') && svg.querySelector('[name=name]').textContent != '')
         name = svg.querySelector('[name=name]').textContent
-    download(data, name, 'svg');
-}
-
-export function downloadJSON(state, style, type) {
-    const data = new Blob([JSON.stringify(saveStatic(state, style, type))], { type: 'text/json' });
-    if (state['name'])
-        name = state['name']
-    download(window.URL.createObjectURL(data), name, 'json');
-}
-
-function download(data, name, type) {
     const link = document.createElement('a');
     link.download = `${name}.${type}`;
     link.href = data;

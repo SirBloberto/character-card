@@ -93,7 +93,7 @@ const Fashion = () => {
             <rect x={305} y={138} width={4} height={34} rx={2} style={{"fill": style.trim}}/>
             <rect x={305} y={173} width={4} height={34} rx={2} style={{"fill": style.trim}}/>
             <Ability name={'strength'} x={275} y={105} text={'STR'}/>
-            <Ability name={'dexteirty'} x={275} y={140} text={'DEX'}/>
+            <Ability name={'dexterity'} x={275} y={140} text={'DEX'}/>
             <Ability name={'constitution'} x={275} y={175} text={'CON'}/>
             <Ability name={'wisdom'} x={345} y={105} text={'WIS'}/>
             <Ability name={'intelligence'} x={345} y={140} text={'INT'}/>

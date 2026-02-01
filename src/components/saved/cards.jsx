@@ -1,13 +1,18 @@
 import { useSaved } from '../../context/saved';
 import { onMount, For, createEffect, batch, Show, createSignal } from 'solid-js';
+import { render } from 'solid-js/web';
 import { styled } from 'solid-styled-components';
 import SavedCard from './card';
 import { useCard } from '../../context/card';
 import { saveStatic, saveDynamic } from '../../utilities/save';
 import plus from '../../images/plus.webp';
+import importCard from '../../images/import.webp';
 import { modifyMutable, reconcile } from 'solid-js/store';
 import { toDefault } from '../../utilities/load';
 import { MOBILE_WIDTH, MOBILE_VERTICAL } from '../../styles/variables';
+import { useApp } from '../../context/app';
+import burger from '../../images/burger.webp';
+import cross from '../../images/cross.webp';
 
 const StyledCards = styled.div`
     min-width: 275px;
@@ -22,7 +27,9 @@ const StyledCards = styled.div`
     }
 
     @media (max-width: ${MOBILE_VERTICAL}px) {
-        display: none;
+        min-width: 100%;
+        position: absolute;
+        z-index: 2;
     }
 `;
 
@@ -35,9 +42,14 @@ const StyledHeader = styled.h2`
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    div {
+        display: flex;
+        gap: 0.5rem;
+    }
 `;
 
-const StyledNew = styled.img`
+const StyledButton = styled.img`
     width: 25px;
     height: 25px;
 
@@ -47,10 +59,22 @@ const StyledNew = styled.img`
     }
 `;
 
+const StyledBurger = styled.img`
+    width: 40px;
+    height: 40px;
+    top: 10px;
+    left: 10px;
+    position: absolute;
+
+    &:hover {
+        cursor: pointer;
+    }
+`;
+
 const SavedCards = () => {
     const { cards, setCards, selected, setSelected, fullscreen } = useSaved();
     const { state, style, type, setType } = useCard();
-    const [vertical, setVertical] = createSignal(false);
+    const { mobile } = useApp();
     const [open, setOpen] = createSignal(false);
     
     onMount(() => {
@@ -96,20 +120,30 @@ const SavedCards = () => {
         data = JSON.stringify(data);
         window.localStorage.setItem('character-card', data);
     });
-    //Need to add burger menu for cards on mobile
 
     return (
-        <Show when={!fullscreen()}>
-            <StyledCards>
-                <StyledHeader>
-                    Saved Cards
-                    <StyledNew src={plus} alt="new" onClick={() => newCard()}></StyledNew>
-                </StyledHeader>
-                <For each={cards}>{(card, index) => 
-                    <SavedCard card={card} index={index}/>
-                }</For>
-            </StyledCards>
-        </Show>
+        <>
+            <Show when={!fullscreen() && mobile() && !open()}>
+                <StyledBurger src={burger} alt="burger" onClick={() => setOpen(true)}/>
+            </Show>
+            <Show when={(!fullscreen() && mobile() && open()) || (!fullscreen() && !mobile())}>
+                <StyledCards>
+                    <StyledHeader>
+                        Saved Cards
+                        <div>
+                            <StyledButton src={plus} alt="new" onClick={() => newCard()}/>
+                            <Show when={mobile() && open()}>
+                                <StyledButton src={cross} alt="cross" onClick={() => setOpen(false)}/>
+                            </Show>
+                        </div>
+                    </StyledHeader>
+                    <For each={cards}>{(card, index) => 
+                        <SavedCard card={card} index={index}/>
+                    }</For>
+                </StyledCards>
+            </Show>
+        </>
+
     );
 }
 

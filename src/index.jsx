@@ -1,6 +1,9 @@
 import { render } from 'solid-js/web';
 import App from './app';
+import { AppProvider } from './context/app';
 
 render(() => (
-    <App/>
+    <AppProvider>
+        <App/>
+    </AppProvider>
 ), document.getElementById('root'));

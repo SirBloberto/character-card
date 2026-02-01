@@ -15,7 +15,7 @@ export default createGlobalStyles`
     #root {
         height: 100%;
         background-image: url(${papyr});
-        overflow: hidden;
+        overflow-x: hidden;
     }
 
     .character-card {
@@ -33,5 +33,50 @@ export default createGlobalStyles`
         height: 100vh;
         width: 100% !important;
         max-width: calc(100vh * (4/3)) !important;
+    }
+
+    .button {
+        border-radius: 20px;
+        margin: auto;
+        border: solid 1px #da7c0c;
+        background: linear-gradient(180deg, #faa51a, #f47a20);
+        box-shadow: 0px 2px 5px #cc7000;
+    
+        &:hover {
+            cursor: pointer;
+            background: linear-gradient(180deg, #f88e11, #f06015);
+        }
+    }
+
+    input[type="range"] {
+        outline: 0;
+        border: 0;
+        border-radius: 500px;
+        cursor: pointer;
+        height: 100%;
+        width: 100%;
+
+        & {
+            overflow: hidden;
+            -webkit-appearance: none;
+            background-color: #bbb;
+        }
+
+        &::-webkit-slider-runnable-track {
+
+        }
+
+        &::-webkit-slider-thumb {
+            width: 20px;
+            height: 20px;
+            -webkit-appearance: none;
+            background: #1597ff;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        &:active::-webkit-slider-thumb {
+            background: #0587ef;
+        }
     }
 `;

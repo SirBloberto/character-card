@@ -7,7 +7,7 @@ import { useCard } from "../../context/card";
 import { saveStatic, saveDynamic } from "../../utilities/save";
 import { batch, createSignal } from 'solid-js';
 import { toDefault } from "../../utilities/load";
-import { MOBILE_WIDTH } from "../../styles/variables";
+import { MOBILE_WIDTH, MOBILE_VERTICAL } from "../../styles/variables";
 
 const StyledOuterCard = styled.div`
     width: 100%;
@@ -45,6 +45,10 @@ const StyledInnerCard = styled.div`
 
     @media (max-width: ${MOBILE_WIDTH}px) {
         width: 175px;
+    }
+
+    @media (max-width: ${MOBILE_WIDTH}px) {
+        width: calc(100% - 50px);
     }
 `;
 
