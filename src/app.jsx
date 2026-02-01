@@ -8,7 +8,7 @@ import { Show } from 'solid-js';
 import rotate from './images/rotate.webp';
 import { useApp } from './context/app';
 
-const StyledMain = styled.div`
+const StyledMain = styled.main`
     display: flex;
     height: 100%;
     justify-content: center;

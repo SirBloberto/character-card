@@ -114,7 +114,7 @@ const Picker = ({ id, name }) => {
                 <Show when={show()}>
                     <StyledSelected/>
                 </Show>
-                <StyledSwatch width={20} colour={style[name]} onClick={() => setShow(true)} class={StyledButton} name={name}/>
+                <StyledSwatch width={20} colour={style[name]} onClick={() => setShow(true)} class={StyledButton} aria-label={name}/>
             </StyledSelector>
         </>
     )

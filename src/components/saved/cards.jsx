@@ -10,7 +10,6 @@ import importCard from '../../images/import.webp';
 import { modifyMutable, reconcile } from 'solid-js/store';
 import { toDefault } from '../../utilities/load';
 import { MOBILE_WIDTH, MOBILE_VERTICAL } from '../../styles/variables';
-import Share from '../share';
 import { useApp } from '../../context/app';
 import burger from '../../images/burger.webp';
 import cross from '../../images/cross.webp';
@@ -132,7 +131,6 @@ const SavedCards = () => {
                     <StyledHeader>
                         Saved Cards
                         <div>
-                            <StyledButton src={importCard} alt="import" onClick={() => render(() => <Share/>, document.getElementById('root'))}/>
                             <StyledButton src={plus} alt="new" onClick={() => newCard()}/>
                             <Show when={mobile() && open()}>
                                 <StyledButton src={cross} alt="cross" onClick={() => setOpen(false)}/>

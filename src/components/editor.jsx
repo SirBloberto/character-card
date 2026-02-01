@@ -63,23 +63,21 @@ const StyledPicker = styled.div`
 
 const StyledButton = styled.button`
     padding: 1rem;
-    width: 65%;
+    border-radius: 20px;
+    margin: auto;
+    width: 45%;
+    border: solid 1px #da7c0c;
+    background: linear-gradient(180deg, #faa51a, #f47a20);
+    box-shadow: 0px 2px 5px #cc7000;
+
+    &:hover {
+        cursor: pointer;
+        background: linear-gradient(180deg, #f88e11, #f06015);
+    }
 
     @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 45%;
         padding: 0.75rem;
         margin: 0;
-    }
-`;
-
-const StyledFooter = styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        display: flex;
-        justify-content: center;
     }
 `;
 
@@ -172,10 +170,7 @@ const Editor = () => {
                     <Card ref={svg}/>
                 </StyledCard>
                 <Show when={!fullscreen()}>
-                    <StyledFooter>
-                        <StyledButton class="button" onClick={() => downloadSVG(svg, state)}>Download SVG</StyledButton>
-                        <StyledButton class="button" onClick={() => render(() => <Share code="TEST"/>, document.getElementById('root'))}>Share</StyledButton>
-                    </StyledFooter>
+                    <StyledButton class="button" onClick={() => downloadSVG(svg, state)}>Download SVG</StyledButton>
                 </Show>
             </StyledEditor>
             <Show when={!fullscreen()}>
