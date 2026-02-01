@@ -6,6 +6,7 @@ import { useCard } from '../context/card';
 import { getMousePosition, getSVGTransform } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';
 import FadeTransition from '../styles/fade';
+import { useApp } from '../context/app';
 
 const StyledSection = styled.g`
     opacity: 0;
@@ -28,19 +29,22 @@ const StyledIcon = styled.image`
 const StyledSlider = css`
     width: 100%;
     height: 100%;
-    position: absolute;
-    z-index: 20;
     writing-mode: vertical-lr;
 `;
 
+const SCALE_MIN = 0.1;
+const SCALE_MAX = 5.0;
+
 const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePosition, children }) => {
     const { state } = useCard();
+    const { mobile } = useApp();
     const [hover, setHover] = createSignal(false);
     const [mouseDown, setMouseDown] = createSignal(false);
     const [offset, setOffset] = createStore({ x: 0, y: 0 });
 
     let svgRef = <svg/>;
     let imageRef;
+    let sliderRef = <input/>;
 
     onMount(() => {
         if (!state[name]) {
@@ -49,6 +53,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
                 state[name]['data'] = null;
                 state[name]['translation'] = { x: 0, y: 0 };
                 state[name]['scale'] = 1;
+                state[name]['aspectratio'] = 1;
             }));
         }
 
@@ -84,6 +89,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
                     reader.onloadend = () => {
                         modifyMutable(state[name], produce((state) => {
                             state.data = reader.result;
+                            state.aspectratio = image.naturalWidth / image.naturalHeight;
                         }));
                         
                         let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE)
@@ -111,6 +117,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
             state.translation.x = 0;
             state.translation.y = 0;
             state.scale = 1;
+            state.aspectration = 1;
         }));
     }
 
@@ -146,20 +153,40 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
             translation.x = transformTranslate.matrix.e;
             translation.y = transformTranslate.matrix.f;
         }));
-        //Modify the children
     }
 
     function scroll(event) {
         if (!state[name].data)
             return;
         let mousePosition = getMousePosition(event, svgRef);
-        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
         let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE);
+        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
         mousePosition.x -= transformTranslate.matrix.e;
         mousePosition.y -= transformTranslate.matrix.f;
-        let scaleFactor = event.deltaY < 0 ? 1.1 : 0.9
-        transformScale.setScale(transformScale.matrix.a * scaleFactor, transformScale.matrix.d * scaleFactor)
+        let scaleFactor = event.deltaY < 0 ? 1.1 : 0.9;
+        let scale = transformScale.matrix.a;
+        if (scaleFactor * scale > SCALE_MAX)
+            scaleFactor = SCALE_MAX / scale;
+        if (scaleFactor * scale < SCALE_MIN)
+            scaleFactor = 1.0;
+        scale *= scaleFactor;
+        transformScale.setScale(scale, scale);
         transformTranslate.setTranslate(transformTranslate.matrix.e + mousePosition.x * (1 - scaleFactor), transformTranslate.matrix.f + mousePosition.y * (1 - scaleFactor));
+        sliderRef.value = transformScale.matrix.a;
+        modifyMutable(state[name], produce((state) => {
+            state.translation.x = transformTranslate.matrix.e;
+            state.translation.y = transformTranslate.matrix.f;
+            state.scale = transformScale.matrix.a;
+        }));
+    }
+
+    function setScale(scale) {
+        let transformScale = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_SCALE);
+        let transformTranslate = getSVGTransform(imageRef, SVGTransform.SVG_TRANSFORM_TRANSLATE);
+        let center = {"x": (height * transformScale.matrix.a) / 2, "y": (height * state[name].aspectratio * transformScale.matrix.a) / 2};
+        let scaleFactor = scale / transformScale.matrix.a;
+        transformScale.setScale(scale, scale);
+        transformTranslate.setTranslate(transformTranslate.matrix.e + center.x * (1 - scaleFactor), transformTranslate.matrix.f + center.y * (1 - scaleFactor));
         modifyMutable(state[name], produce((state) => {
             state.translation.x = transformTranslate.matrix.e;
             state.translation.y = transformTranslate.matrix.f;
@@ -188,8 +215,6 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
         return transformScale;
     }
 
-    //Add slider for size
-
     return (
         <svg ref={svgRef} class={'image'} name={name} x={x} y={y} width={width} height={height}>
             <image ref={element => {imageRef = element; attachTransforms()}} href={state[name] ? state[name].data : null} height={height} alt="image"/>
@@ -201,14 +226,15 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
                     <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size}/>
                 </Show>
                 <FadeTransition>
-                    {/* Should always be active on mobile */}
-                    <Show when={state[name] && state[name].data && hover() && !mouseDown()}>
+                    <Show when={state[name] && state[name].data && ((hover() && !mouseDown()) || mobile())}>
                         <StyledIcon href={cross} onclick={deleteImage} x={deletePosition.x} y={deletePosition.y} size={size}/>
                     </Show>
                 </FadeTransition>
-                <foreignObject x={deletePosition.x} y={deletePosition.y + 25} width={size} height="125">
-                    <input type="range" min="1" max="10" value="1" step="0.1" class={StyledSlider} onrangechange={console.log("ASD")}/>
-                </foreignObject>
+                <Show when={state[name] && state[name].data && ((hover() && !mouseDown()) || mobile())}>
+                    <foreignObject x={deletePosition.x} y={deletePosition.y + 25} width={size} height="125">
+                        <input ref={sliderRef} type="range" min={SCALE_MIN} max={SCALE_MAX} value={state[name].scale} step="0.01" class={StyledSlider} oninput={(event) => setScale(event.target.value)}/>
+                    </foreignObject>
+                </Show>
             </svg>
         </svg>
     )
