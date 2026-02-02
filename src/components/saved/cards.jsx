@@ -1,12 +1,10 @@
 import { useSaved } from '../../context/saved';
 import { onMount, For, createEffect, batch, Show, createSignal } from 'solid-js';
-import { render } from 'solid-js/web';
 import { styled } from 'solid-styled-components';
 import SavedCard from './card';
 import { useCard } from '../../context/card';
 import { saveStatic, saveDynamic } from '../../utilities/save';
 import plus from '../../images/plus.webp';
-import importCard from '../../images/import.webp';
 import { modifyMutable, reconcile } from 'solid-js/store';
 import { toDefault } from '../../utilities/load';
 import { MOBILE_WIDTH, MOBILE_VERTICAL } from '../../styles/variables';

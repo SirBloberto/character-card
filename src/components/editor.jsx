@@ -1,6 +1,5 @@
 import { styled } from 'solid-styled-components';
 import { downloadSVG } from '../utilities/download';
-import { render } from 'solid-js/web';
 import Card from './card';
 import Picker from './picker';
 import { useCard } from '../context/card';
@@ -10,7 +9,6 @@ import { useSaved } from '../context/saved';
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import maximize from '../images/full-screen.webp';
 import minimize from '../images/minus.webp';
-import Share from './share';
 
 const StyledMain = styled.div`
     margin: 1rem auto;
@@ -106,7 +104,7 @@ const StyledFullscreen = styled.img`
 `;
 
 const Editor = () => {
-    const { state, style, type } = useCard();
+    const { state, type } = useCard();
     const { fullscreen, setFullscreen } = useSaved();
     const [mouseMoved, setMouseMoved] = createSignal(false);
 
@@ -170,7 +168,7 @@ const Editor = () => {
                     <Card ref={svg}/>
                 </StyledCard>
                 <Show when={!fullscreen()}>
-                    <StyledButton class="button" onClick={() => downloadSVG(svg, state)}>Download SVG</StyledButton>
+                    <StyledButton class="button" onClick={() => downloadSVG(svg, state, type)}>Download SVG</StyledButton>
                 </Show>
             </StyledEditor>
             <Show when={!fullscreen()}>

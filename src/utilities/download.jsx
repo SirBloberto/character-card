@@ -1,6 +1,8 @@
+import { track } from '@vercel/analytics';
+
 let name = 'character-card';
 
-export function downloadSVG(svg, state) {
+export function downloadSVG(svg, state, type) {
     while(typeof(svg) == 'function')
         svg = svg()
     svg = svg.cloneNode(true);
@@ -23,4 +25,5 @@ export function downloadSVG(svg, state) {
     link.href = data;
     link.click();
     link.remove();
+    track("Card Downloaded", { theme: type})
 }
