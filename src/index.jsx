@@ -1,11 +1,12 @@
 import { render } from 'solid-js/web';
 import App from './app';
 import { AppProvider } from './context/app';
-import { inject } from '@vercel/analytics';
-import { injectSpeedInsights } from '@vercel/speed-insights';
 
-inject();
-injectSpeedInsights();
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
 
 render(() => (
     <AppProvider>

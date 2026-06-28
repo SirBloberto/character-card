@@ -1,0 +1,18 @@
+{
+    "name": "CharacterForge",
+    "short_name": "CharacterForge",
+    "description": "Create beautiful TTRPG character cards. Customise colours, upload a portrait and share with a link — free.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#22222a",
+    "theme_color": "#22222a",
+    "orientation": "landscape",
+    "icons": [
+        {
+            "src": "/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

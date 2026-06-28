@@ -1,207 +1,358 @@
-import { styled, css } from 'solid-styled-components';
-import { Portal } from "solid-js/web";
-import { createSignal, onMount, Show } from 'solid-js';
-import copy from '../images/copy.webp';
-import { saveStatic } from '../utilities/save';
-import cross from '../images/cross.webp';
+import { createSignal, Show, onMount, batch } from 'solid-js';
+import { Portal } from 'solid-js/web';
+import { modifyMutable, reconcile } from 'solid-js/store';
+import { styled } from 'solid-styled-components';
+import { useCard } from '../context/card';
+import { useSaved } from '../context/saved';
+import { saveStatic, saveDynamic } from '../utilities/save';
+import {
+    buildShareURL, decodeCard, extractCode, isShortCode,
+    shareToAPI, loadFromAPI,
+} from '../utilities/share';
 
+/* ─── Shell ──────────────────────────────────────────────────── */
 
-const StyledPopup = styled.div`
-    position: absolute;
-    width: ${props => props.width}px;
-    height: 150px;
-    margin: auto;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #444;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    z-index: 3;
+const StyledBackdrop = styled.div`
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 900;
+    backdrop-filter: blur(2px);
 `;
 
-const StyledBackground = styled.div`
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.5;
-    background: #000;
-    z-index: 3;
+const StyledModal = styled.div`
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 901;
+    width: 340px;
+    background: #1a1a22;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+`;
+
+const StyledHeader = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.2rem 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+`;
+
+const StyledTitle = styled.h2`
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #E8932A;
+    letter-spacing: 0.04em;
+`;
+
+const StyledClose = styled.button`
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.12s, color 0.12s;
+
+    &:hover { border-color: rgba(255,255,255,0.35); color: rgba(255,255,255,0.9); }
+`;
+
+/* ─── Tabs ───────────────────────────────────────────────────── */
+
+const StyledTabs = styled.div`
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+`;
+
+const StyledTab = styled.button`
+    flex: 1;
+    padding: 0.65rem;
+    background: transparent;
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    color: ${props => props.active ? '#fff' : 'rgba(255,255,255,0.35)'};
+    border-bottom: 2px solid ${props => props.active ? '#E8932A' : 'transparent'};
+    margin-bottom: -1px;
+    transition: color 0.12s, border-color 0.12s;
+
+    &:hover { color: ${props => props.active ? '#fff' : 'rgba(255,255,255,0.65)'}; }
+`;
+
+/* ─── Body ───────────────────────────────────────────────────── */
+
+const StyledBody = styled.div`
+    padding: 1.1rem 1.2rem 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+`;
+
+const StyledHint = styled.p`
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.5;
+    margin: 0;
 `;
 
 const StyledCode = styled.div`
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: #E8932A;
+    padding: 0.4rem 0;
+    text-transform: uppercase;
+`;
+
+const StyledInputRow = styled.div`
     display: flex;
-    gap: 0.75rem;
-    margin: auto;
-    justify-content: center;
-    align-items: center;
+    gap: 0.5rem;
 `;
 
 const StyledInput = styled.input`
-    width: 3rem;
-    height: 4rem;
-    border: 0;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: 'Inter', monospace;
     outline: none;
-    font-size: 3rem;
+    min-width: 0;
+    transition: border-color 0.12s;
+
+    &::placeholder { color: rgba(255, 255, 255, 0.25); }
+    &:focus { border-color: rgba(255, 255, 255, 0.25); }
+`;
+
+const StyledCopyBtn = styled.button`
+    flex-shrink: 0;
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    border: none;
+    background: ${props => props.success ? '#3ddc5a' : '#E8932A'};
+    color: ${props => props.success ? '#050f05' : '#0a0a0a'};
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    &:hover { background: ${props => props.success ? '#3ddc5a' : '#d4821e'}; }
+`;
+
+const StyledPrimaryBtn = styled.button`
+    width: 100%;
+    padding: 0.65rem;
+    border-radius: 8px;
+    border: none;
+    background: #E8932A;
+    color: #0a0a0a;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    opacity: ${props => props.disabled ? 0.4 : 1};
+    pointer-events: ${props => props.disabled ? 'none' : 'auto'};
+
+    &:hover { background: #d4821e; }
+`;
+
+const StyledError = styled.p`
+    font-size: 0.7rem;
+    color: #e05050;
+    margin: 0;
+`;
+
+const StyledSuccess = styled.p`
+    font-size: 0.7rem;
+    color: #3ddc5a;
+    margin: 0;
+`;
+
+const StyledNote = styled.p`
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.25);
+    margin: 0;
+    line-height: 1.4;
+`;
+
+const StyledSpinner = styled.p`
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
     text-align: center;
-    border-radius: 5px;
-    background: #333;
-    color: #fff;
+    margin: 0;
+    padding: 0.5rem 0;
 `;
 
-const StyledCopy = css`
-    width: 4rem;
-    height: 4rem;
+/* ─── Component ──────────────────────────────────────────────── */
 
-    cursor: pointer;
-    &:hover {
-        filter: brightness(90%);
-    }
-`;
+const Share = ({ onClose }) => {
+    const { style, state, type, setType } = useCard();
+    const { cards, setCards, selected, setSelected } = useSaved();
 
-const StyledReadOnly = css`
-    margin-right: 1rem !important;
-`;
+    const [tab, setTab] = createSignal('share');
+    const [phase, setPhase] = createSignal('loading'); // 'loading' | 'short' | 'url'
+    const [shortCode, setShortCode] = createSignal('');
+    const [shareURL, setShareURL] = createSignal('');
+    const [loadInput, setLoadInput] = createSignal('');
+    const [copied, setCopied] = createSignal(false);
+    const [loadError, setLoadError] = createSignal(null);
+    const [loadSuccess, setLoadSuccess] = createSignal(false);
+    const [loading, setLoading] = createSignal(false);
 
-const StyledHeader = styled.h3`
-    margin: auto;
-    margin-bottom: 0;
-    color: #fff;
-    font-size: 1.5rem;
-`;
-
-const StyledExit = styled.img`
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    cursor: pointer;
-`;
-
-
-const Share = ({ code }) => {
-    const [message, setMessage] = createSignal(null);
-
-    let share_code;
-    let width = code ? 350 : 275;
-    let header = code ? "Copy code" : "Enter code";
-
-    onMount(() => {
-        share_code = document.getElementById("share-code");
-        if (code) {
-            disableInput(true);
-            share_code.appendChild(<img src={copy} class={StyledCopy} onclick={navigator.clipboard.writeText(copyCode())}/>);
-            share_code.classList.add(StyledReadOnly);
-            shareInput({"data": code, "target": share_code.firstChild});
+    onMount(async () => {
+        try {
+            const { code } = await shareToAPI(style, state, type());
+            const url = new URL(window.location.href);
+            url.search = '';
+            url.searchParams.set('code', code);
+            setShortCode(code.toUpperCase());
+            setShareURL(url.toString());
+            setPhase('short');
+        } catch {
+            setShareURL(buildShareURL(style, state, type()) ?? '');
+            setPhase('url');
         }
-
-        share_code.firstChild.focus();
-        document.addEventListener('keydown', keyPress);
     });
 
-    function shareInput(event) {
-        let sibling;
-        console.log(event.inputType == "insertFromPaste");
-        if (!event.data || !event.data.match(/^[0-9a-z]+$/)) {
-            event.target.value = "";
-            return
+    async function copy(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2200);
+        } catch {
+            document.querySelector('#share-url-input')?.select();
         }
-        event.target.value = event.data;
-
-        sibling = event.target.nextSibling;
-        if (sibling && !sibling.disabled)
-            sibling.focus();
-        else
-            downloadCard();
     }
 
-    function inputFocus(event) {
-        let target = event.target;
-        if (target.value)
-            target.select();
-    }
+    async function handleLoad() {
+        setLoadError(null);
+        const raw = loadInput().trim();
+        if (!raw) { setLoadError('Paste a share link or code.'); return; }
 
-    function keyPress(event) {
-        let focusElement = document.activeElement;
-        let key = event.key;
+        const extracted = extractCode(raw);
+        setLoading(true);
 
-        if (key == "ArrowLeft" || key == "ArrowUp" || key == "Backspace")
-            focusElement = focusElement.previousSibling;
-        else if (key == "ArrowRight" || key == "ArrowDown" || key == "Delete")
-            focusElement = focusElement.nextSibling;
-        else
-            focusElement = null;
-        
-        if(focusElement && !focusElement.disabled)
-            setTimeout(() => focusElement.focus(), 1);
-    }
+        let data;
+        try {
+            if (isShortCode(extracted)) {
+                data = await loadFromAPI(extracted);
+            } else {
+                data = decodeCard(extracted);
+                if (!data) throw new Error('Could not decode link');
+            }
+        } catch (err) {
+            setLoadError(err.message || 'Invalid link or code — please check and try again.');
+            setLoading(false);
+            return;
+        }
 
-    function copyCode() {
-        let code = "";
-        for (let i = 0; i < share_code.childElementCount - 1; i++)
-            code += share_code.children[i].value
-        return code;
-    }
+        if (!data?.v) {
+            setLoadError('Unrecognised card format.');
+            setLoading(false);
+            return;
+        }
 
-    function disableInput(value) {
-        let inputs = share_code.querySelectorAll("input");
-        for (let i = 0; i < inputs.length; i++)
-            share_code.children[i].disabled = value;
-    }
-
-    function downloadCard() {
-        disableInput(true);
-        fetch("http://localhost:3000/character-card/store", {
-            method: "GET",
-        }).then(response => {
-            console.log(response)
-        }).catch(error => {
-            console.log(error);
+        batch(() => {
+            setCards(selected(), saveStatic(state, style, type()));
+            modifyMutable(state, reconcile(data.state ?? {}));
+            if (data.style) {
+                style.trim = data.style.trim ?? style.trim;
+                style.fill = data.style.fill ?? style.fill;
+                style.base = data.style.base ?? style.base;
+                style.text = data.style.text ?? style.text;
+            }
+            if (data.type) setType(data.type);
+            setCards(cards.length, saveDynamic(state, style, type()));
+            setSelected(cards.length - 1);
         });
-    }
 
-    function uploadCard() {
-        fetch("localhost:3000/character-card/store", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify(saveStatic(state, style, type))
-        }).then(response => {
-            console.log(response);
-        });
-    }
-
-    function close() {
-        let share = share_code.parentNode.parentNode;
-        document.removeEventListener('keydown', keyPress);
-        share.parentNode.removeChild(share);
+        setLoading(false);
+        setLoadSuccess(true);
+        setTimeout(() => onClose?.(), 900);
     }
 
     return (
         <Portal>
-            <StyledBackground/>
-            <StyledPopup width={width}>
-                <Show when={!message()} fallback={
-                    <Show when={message() != 'loading'} fallback={''}>
-                        <StyledText>{message()}</StyledText>
-                        <StyledButton onclick={(e) => console.log(e)}>Ok</StyledButton>
-                    </Show>
-                }>
-                    <StyledHeader>{header}</StyledHeader>
-                    <StyledCode id="share-code">
-                        <StyledInput name="code" type="text" oninput={shareInput} onfocus={inputFocus}/>
-                        <StyledInput name="code" type="text" oninput={shareInput} onfocus={inputFocus}/>
-                        <StyledInput name="code" type="text" oninput={shareInput} onfocus={inputFocus}/>
-                        <StyledInput name="code" type="text" oninput={shareInput} onfocus={inputFocus}/>
-                    </StyledCode>
-                    <StyledExit src={cross} alt="cross" onclick={() => close()}/>
+            <StyledBackdrop onClick={onClose}/>
+            <StyledModal>
+                <StyledHeader>
+                    <StyledTitle>Share Card</StyledTitle>
+                    <StyledClose onClick={onClose} aria-label="Close">✕</StyledClose>
+                </StyledHeader>
+
+                <StyledTabs>
+                    <StyledTab active={tab() === 'share'} onClick={() => setTab('share')}>Get Link</StyledTab>
+                    <StyledTab active={tab() === 'load'}  onClick={() => setTab('load')}>Load Card</StyledTab>
+                </StyledTabs>
+
+                <Show when={tab() === 'share'}>
+                    <StyledBody>
+                        <Show when={phase() === 'loading'}>
+                            <StyledSpinner>Generating link…</StyledSpinner>
+                        </Show>
+
+                        <Show when={phase() === 'short'}>
+                            <StyledHint>Share this code or copy the full link.</StyledHint>
+                            <StyledCode>{shortCode()}</StyledCode>
+                            <StyledInputRow>
+                                <StyledInput id="share-url-input" readOnly value={shareURL()} onClick={e => e.target.select()}/>
+                                <StyledCopyBtn success={copied()} onClick={() => copy(shareURL())}>
+                                    {copied() ? '✓' : 'Copy'}
+                                </StyledCopyBtn>
+                            </StyledInputRow>
+                            <StyledNote>Link expires in 30 days. Portrait images are not included.</StyledNote>
+                        </Show>
+
+                        <Show when={phase() === 'url'}>
+                            <StyledHint>Your card is encoded in this link. Copy and share it — no account needed.</StyledHint>
+                            <StyledInputRow>
+                                <StyledInput id="share-url-input" readOnly value={shareURL()} onClick={e => e.target.select()}/>
+                                <StyledCopyBtn success={copied()} onClick={() => copy(shareURL())}>
+                                    {copied() ? '✓' : 'Copy'}
+                                </StyledCopyBtn>
+                            </StyledInputRow>
+                            <StyledNote>Portrait images are not included.</StyledNote>
+                        </Show>
+                    </StyledBody>
                 </Show>
-            </StyledPopup>
+
+                <Show when={tab() === 'load'}>
+                    <StyledBody>
+                        <StyledHint>Paste a share link or enter a 6-character code to add that card to your collection.</StyledHint>
+                        <StyledInput
+                            placeholder="e.g. X7K4Z2 or paste full link…"
+                            value={loadInput()}
+                            onInput={e => { setLoadInput(e.target.value); setLoadError(null); setLoadSuccess(false); }}
+                        />
+                        <Show when={loadError()}>
+                            <StyledError>{loadError()}</StyledError>
+                        </Show>
+                        <Show when={loadSuccess()}>
+                            <StyledSuccess>Card loaded!</StyledSuccess>
+                        </Show>
+                        <StyledPrimaryBtn disabled={!loadInput().trim() || loading()} onClick={handleLoad}>
+                            {loading() ? 'Loading…' : 'Load Card'}
+                        </StyledPrimaryBtn>
+                    </StyledBody>
+                </Show>
+            </StyledModal>
         </Portal>
-    )
-}
+    );
+};
 
 export default Share;

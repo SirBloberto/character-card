@@ -1,41 +1,53 @@
 import { onMount } from 'solid-js';
 import { useCard } from '../context/card';
 
-const Field = ({ name, x, y, width, height, align, text, placeholder }) => {
+const Field = (props) => {
     const { style, state } = useCard();
 
-    let textAnchor = align;
-    if (align == "center")
-        textAnchor = "middle";
-    const textX = { "start": x, "center": x + width / 2, "end": x + width };
-    const textY = y + height / 2;
+    const align = () => props.align;
+    const textAnchor = () => props.align === 'center' ? 'middle' : props.align;
+    const textX = () => {
+        if (props.align === 'center') return props.x + props.width / 2;
+        if (props.align === 'end') return props.x + props.width;
+        return props.x;
+    };
+    const textY = () => props.y + props.height / 2;
 
     onMount(() => {
-        if (!state[name])
-            state[name] = '';
+        if (!state[props.name])
+            state[props.name] = '';
     });
 
     return (
-        <svg name={name} className={'field'} x={0} y={0} width={width + x} height={height + y}>
-            <text x={textX[align]} y={textY} style={{
-                "text-anchor": textAnchor,
+        <svg name={props.name} className={'field'} x={0} y={0} width={props.width + props.x} height={props.height + props.y}>
+            <text x={textX()} y={textY()} style={{
+                "text-anchor": textAnchor(),
                 "dominant-baseline": "central",
                 "fill": style.trim,
-                ...text
+                ...props.text
             }}></text>
-            <foreignObject x={x} y={y} width={width} height={height}>
-                <input aria-label={name} name={"field-" + name} value={state[name]} onInput={(input) => state[name] = input.target.value} style={{
-                    "border": "0",
-                    "outline": "none",
-                    "box-sizing": "border-box",
-                    "width": "100%",
-                    "height": "100%",
-                    "background-color": "#00000000",
-                    "vertical-align": "top",
-                    "text-align": align,
-                    "color": style.trim,
-                    ...text
-                }} placeholder={placeholder} autocomplete='off'/>
+            <foreignObject x={props.x} y={props.y} width={props.width} height={props.height}>
+                <input
+                    aria-label={props.name}
+                    name={"field-" + props.name}
+                    value={state[props.name]}
+                    onInput={(e) => state[props.name] = e.target.value}
+                    style={{
+                        "border": "0",
+                        "outline": "none",
+                        "box-sizing": "border-box",
+                        "width": "100%",
+                        "height": "100%",
+                        "background-color": "transparent",
+                        "vertical-align": "top",
+                        "text-align": align(),
+                        "color": style.trim,
+                        ...props.text
+                    }}
+                    placeholder={props.placeholder}
+                    autocomplete='off'
+                    maxLength={props.max_length}
+                />
             </foreignObject>
         </svg>
     );

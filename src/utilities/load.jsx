@@ -1,12 +1,24 @@
 import Basic from '../cards/basic';
 import Fashion from '../cards/fashion';
+import Tome from '../cards/tome';
+import Wanted from '../cards/wanted';
+import Arcane from '../cards/arcane';
+import Nordic from '../cards/nordic';
+import Elven from '../cards/elven';
+import Codex from '../cards/codex';
+import Tarot from '../cards/tarot';
 
 export const CARDS = {
     'basic': Basic,
-    'fashion': Fashion
+    'fashion': Fashion,
+    'tome': Tome,
+    'wanted': Wanted,
+    'arcane': Arcane,
+    'nordic': Nordic,
+    'elven': Elven,
+    'codex': Codex,
+    'tarot': Tarot,
 }
-
-export const CardType = (svg) => svg.querySelector("card-type");
 
 export function toDefault(state) {
     for (const key in state) {

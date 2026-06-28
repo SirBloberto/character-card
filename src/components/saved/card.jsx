@@ -1,89 +1,103 @@
 import { styled } from "solid-styled-components";
 import { useSaved } from '../../context/saved';
 import cross from '../../images/cross.webp';
-import edit from '../../images/edit.webp';
-import { modifyMutable, produce, reconcile, unwrap } from 'solid-js/store';
+import { modifyMutable, produce, reconcile } from 'solid-js/store';
 import { useCard } from "../../context/card";
 import { saveStatic, saveDynamic } from "../../utilities/save";
-import { batch, createSignal } from 'solid-js';
+import { batch, createSignal, Show } from 'solid-js';
 import { toDefault } from "../../utilities/load";
-import { MOBILE_WIDTH, MOBILE_VERTICAL } from "../../styles/variables";
 
-const StyledOuterCard = styled.div`
+const StyledCard = styled.div`
     width: 100%;
-    height: 50px;
-
-    background-color: ${props => props.base};
-    border-radius: 10px;
-    border: 2px solid ${props => props.trim};
+    border-radius: 8px;
+    border: 2px solid ${props => props.active ? '#E8932A' : 'transparent'};
     box-sizing: border-box;
-    display: flex;
-`;
-
-const StyledInnerCard = styled.div`
-    width: 225px;
-    height: 100%;
-
-    background-color: ${props => props.fill};
-    border-radius: 10px;
-    outline: 2px solid ${props => props.trim};
-    color: ${props => props.trim};
-    box-sizing: border-box;
-    font-size: 1.5rem;
-    padding-left: 1rem;
-    display: flex;
-    align-items: start;
     overflow: hidden;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color 0.12s ease, filter 0.12s ease;
+
+    &:hover {
+        filter: brightness(1.1);
+    }
+`;
+
+const StyledThumbTop = styled.div`
+    height: 42px;
+    background-color: ${props => props.fill};
+    display: flex;
+    align-items: flex-start;
+    padding: 6px 8px 0;
+    gap: 5px;
+    position: relative;
+`;
+
+const StyledThumbDot = styled.div`
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${props => props.color};
+    opacity: 0.8;
+    flex-shrink: 0;
+    margin-top: 1px;
+`;
+
+const StyledThumbLine = styled.div`
+    height: 3px;
+    border-radius: 2px;
+    background: ${props => props.color};
+    opacity: 0.55;
+    flex: 1;
+    margin-top: 2px;
+`;
+
+const StyledCardName = styled.div`
+    position: absolute;
+    bottom: 5px;
+    left: 8px;
+    right: 8px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.92);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.7);
+`;
 
-    &:hover {
+const StyledThumbBottom = styled.div`
+    height: 14px;
+    background-color: ${props => props.base};
+`;
+
+const StyledDeleteBtn = styled.img`
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.5);
+    padding: 2px;
+    box-sizing: border-box;
+
+    ${StyledCard}:hover & {
+        opacity: 1;
         cursor: pointer;
     }
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        width: 175px;
-    }
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        width: calc(100% - 50px);
-    }
 `;
 
-const StyledClass = styled.div`
-    font-size: 0.65rem;
-    margin-left: 0.2rem;
-`;
-
-const StyledDelete = styled.img`
-    width: 20px;
-    height: 20px;
-    display: flex;
-    margin: auto;
-
-    &:hover {
-        cursor: pointer;
-        filter: brightness(90%);
-    }
-`;
-
-const StyledEdit = styled.img`
-    width: 20px;
-    height: 20px;
-    display: flex;
-    margin: auto;
-`;
-
-const SavedCard = ({ card, index }) => {
+const SavedCard = ({ card, index, onSelect }) => {
     const { cards, setCards, selected, setSelected } = useSaved();
     const { state, style, type, setType } = useCard();
-    const [hover, setHover] = createSignal(false);
 
     function changeCard() {
-        if (selected() == index())
-            return;
+        if (selected() === index()) return;
         batch(() => {
             setCards(selected(), saveStatic(state, style, type()));
             modifyMutable(state, reconcile(cards[index()]['state']));
@@ -91,23 +105,25 @@ const SavedCard = ({ card, index }) => {
             setType(cards[index()]['type']);
             setSelected(index());
             setCards(index(), saveDynamic(state, style, type()));
-            setHover(false);
         });
+        onSelect?.();
     }
 
-    function deleteCard() {
+    function deleteCard(e) {
+        e.stopPropagation();
         batch(() => {
             setCards(produce((cards) => cards.splice(index(), 1)));
-            if (selected() != 0 && index() <= selected()) {
+            if (selected() !== 0 && index() <= selected()) {
                 setSelected(selected() - 1);
                 modifyMutable(state, reconcile(cards[selected()]['state']));
                 modifyMutable(style, reconcile(cards[selected()]['style']));
                 setType(cards[selected()]['type']);
-            } else if (cards.length == 0) {
+            } else if (cards.length === 0) {
                 modifyMutable(state, reconcile(toDefault(state)));
-                style['trim'] = 'rgb(0, 0, 0)';
-                style['base'] = 'rgb(216, 216, 216)';
-                style['fill'] = 'rgb(150, 150, 150)';
+                style['trim'] = '#E8932A';
+                style['fill'] = '#22222e';
+                style['base'] = '#16161f';
+                style['text'] = '#f0eefc';
                 setSelected(0);
             }
             setCards(selected(), saveDynamic(state, style, type()));
@@ -115,21 +131,19 @@ const SavedCard = ({ card, index }) => {
     }
 
     return (
-        <StyledOuterCard base={card['style']['base']} trim={card['style']['trim']} on:mouseenter={() => setHover(true)} on:mouseleave={() => setHover(false)}>
-            <StyledInnerCard onClick={() => changeCard()} fill={card['style']['fill']} trim={card['style']['trim']}>
-                {card['state']['name']}
-                <Show when={card['state']['class'] != ''}>
-                    <StyledClass>{card['state']['class']}</StyledClass>
-                </Show>
-            </StyledInnerCard>
-            <Show when={hover()}>
-                <StyledDelete src={cross} alt="delete" onClick={() => deleteCard()}/>
-            </Show>
-            <Show when={selected() == index() && !hover()}>
-                <StyledEdit src={edit} alt="edit"/>
-            </Show>
-        </StyledOuterCard>
-    )
+        <StyledCard active={selected() === index()} onClick={changeCard}>
+            <StyledThumbTop fill={card['style']['fill'] || '#22222e'}>
+                <StyledThumbDot color={card['style']['trim'] || '#E8932A'}/>
+                <StyledThumbLine color={card['style']['trim'] || '#E8932A'}/>
+                <StyledThumbLine color={card['style']['trim'] || '#E8932A'} style={{flex: '0.5'}}/>
+                <StyledCardName>
+                    {card['state']['name'] || 'Unnamed'}
+                </StyledCardName>
+            </StyledThumbTop>
+            <StyledThumbBottom base={card['style']['base'] || '#16161f'}/>
+            <StyledDeleteBtn src={cross} alt="delete" onClick={deleteCard}/>
+        </StyledCard>
+    );
 }
 
 export default SavedCard;

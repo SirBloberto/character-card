@@ -7,9 +7,10 @@ export const SavedProvider = (props) => {
     const [cards, setCards] = createStore([]);
     const [selected, setSelected] = createSignal(0);
     const [fullscreen, setFullscreen] = createSignal(false);
+    const [cardRef, setCardRef] = createSignal(null);
 
     return (
-        <SavedContext.Provider value={{ cards, setCards, selected, setSelected, fullscreen, setFullscreen }}>
+        <SavedContext.Provider value={{ cards, setCards, selected, setSelected, fullscreen, setFullscreen, cardRef, setCardRef }}>
             {props.children}
         </SavedContext.Provider>
     );

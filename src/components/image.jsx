@@ -1,7 +1,6 @@
 import { styled, css } from 'solid-styled-components';
 import { createSignal, onMount, Show, batch, onCleanup } from 'solid-js';
 import cross from '../images/cross.webp';
-import plus from '../images/plus.webp';
 import { useCard } from '../context/card';
 import { getMousePosition, getSVGTransform } from '../helpers/image';
 import { createStore, modifyMutable, produce } from 'solid-js/store';
@@ -117,7 +116,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
             state.translation.x = 0;
             state.translation.y = 0;
             state.scale = 1;
-            state.aspectration = 1;
+            state.aspectratio = 1;
         }));
     }
 
@@ -223,7 +222,28 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
                     {...children}
                 </StyledSection>
                 <Show when={state[name] && !state[name].data}>
-                    <StyledIcon href={plus} onclick={uploadImage} x={newPosition.x} y={newPosition.y} size={size}/>
+                    <g onclick={uploadImage} style="cursor: pointer">
+                        <rect width={width} height={height} fill="rgba(0,0,0,0)" pointer-events="all"/>
+                        <svg
+                            x={width / 2 - 28} y={height / 2 - 38}
+                            width="56" height="56"
+                            viewBox="0 0 32 32" fill="none" overflow="visible"
+                        >
+                            <circle cx="16" cy="11" r="5.5" stroke="white" stroke-width="1.5" stroke-opacity="0.45"/>
+                            <path d="M5 28c0-6.075 4.925-11 11-11s11 4.925 11 11"
+                                stroke="white" stroke-width="1.5" stroke-opacity="0.45" stroke-linecap="round"/>
+                        </svg>
+                        <text
+                            x={width / 2} y={height / 2 + 30}
+                            text-anchor="middle"
+                            font-family="Cinzel, serif"
+                            font-size="8.5"
+                            font-weight="600"
+                            letter-spacing="0.1em"
+                            fill="white"
+                            fill-opacity="0.3"
+                        >CLICK TO UPLOAD</text>
+                    </g>
                 </Show>
                 <FadeTransition>
                     <Show when={state[name] && state[name].data && ((hover() && !mouseDown()) || mobile())}>
@@ -231,7 +251,7 @@ const ImageComponent = ({ name, x, y, width, height, size, newPosition, deletePo
                     </Show>
                 </FadeTransition>
                 <Show when={state[name] && state[name].data && ((hover() && !mouseDown()) || mobile())}>
-                    <foreignObject x={deletePosition.x} y={deletePosition.y + 25} width={size} height="125">
+                    <foreignObject x={deletePosition.x} y={deletePosition.y + 25} width={size} height={height - deletePosition.y - 35}>
                         <input ref={sliderRef} type="range" min={SCALE_MIN} max={SCALE_MAX} value={state[name].scale} step="0.01" class={StyledSlider} oninput={(event) => setScale(event.target.value)}/>
                     </foreignObject>
                 </Show>

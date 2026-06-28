@@ -1,184 +1,144 @@
 import { styled } from 'solid-styled-components';
-import { downloadSVG } from '../utilities/download';
 import Card from './card';
-import Picker from './picker';
-import { useCard } from '../context/card';
-import Selector from './selector';
-import { MOBILE_VERTICAL, MOBILE_WIDTH } from '../styles/variables';
 import { useSaved } from '../context/saved';
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
-import maximize from '../images/full-screen.webp';
-import minimize from '../images/minus.webp';
+import { useCard } from '../context/card';
+import { Show, createSignal, onCleanup, onMount } from 'solid-js';
 
-const StyledMain = styled.div`
-    margin: 1rem auto;
-    padding: 1rem;
-    width: 100%;
+const CARD_RATIO = { basic: 1.4, fashion: 1.4, tome: 1.4, wanted: 1.4, arcane: 1.4, nordic: 1.4, elven: 1.4, codex: 1.4, tarot: 1.4 };
+
+const StyledCanvas = styled.div`
+    flex: 1;
     display: flex;
     justify-content: center;
-    align-self: center;
-    gap: 4rem;
-    max-width: calc(100vh * (5/4));
-    box-sizing: border-box;
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        gap: 1rem;
-    }
-
-    @media (max-width: ${MOBILE_VERTICAL}px) {
-        flex-direction: column-reverse;
-        align-self: start;
-        margin-top: 4rem;
-        max-width: 100%;
-    }
+    align-items: center;
+    background: #1c1c24;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.11) 1px, transparent 1px);
+    background-size: 24px 24px;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
 `;
 
-const StyledEditor = styled.div`
-    width: 90%;
-    min-width: 200px;
-    max-width: 950px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    justify-content: center;
-
-    @media (max-width: ${MOBILE_VERTICAL}px) {
-        width: 100%;
-    }
+const StyledCardWrap = styled.div`
+    width: 94%;
+    max-width: 900px;
 `;
 
-const StyledPicker = styled.div`
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 4fr 1fr;
-    height: 13vh;
-    row-gap: 0.5rem;
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        height: 32vw;
-    }
-`;
-
-const StyledButton = styled.button`
-    padding: 1rem;
-    border-radius: 20px;
-    margin: auto;
-    width: 45%;
-    border: solid 1px #da7c0c;
-    background: linear-gradient(180deg, #faa51a, #f47a20);
-    box-shadow: 0px 2px 5px #cc7000;
-
-    &:hover {
-        cursor: pointer;
-        background: linear-gradient(180deg, #f88e11, #f06015);
-    }
-
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        padding: 0.75rem;
-        margin: 0;
-    }
-`;
-
-const StyledCard = styled.div`
-    width: 100%;
-    align-self: center;
-`;
-
-const StyledFullscreen = styled.img`
-    width: 50px;
-    height: 50px;
-    top: 25px;
-    right: 25px;
+const StyledCanvasBtn = styled.button`
     position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    transition: opacity 0.15s, background 0.15s;
 
-    &:hover {
-        cursor: pointer;
-    }
+    svg { width: 16px; height: 16px; }
 
-    @media (max-width: ${MOBILE_WIDTH}px) {
-        top: 10px;
-        right: 10px;
-        width: 40px;
-        height: 40px;
-    }
+    &:hover { opacity: 1; background: rgba(0,0,0,0.6); }
 `;
+
+const MaximizeIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+        <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+        <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+        <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+    </svg>
+);
+
+const MinimizeIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+        <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+        <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+        <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+    </svg>
+);
 
 const Editor = () => {
-    const { state, type } = useCard();
-    const { fullscreen, setFullscreen } = useSaved();
-    const [mouseMoved, setMouseMoved] = createSignal(false);
+    const { fullscreen, setFullscreen, setCardRef } = useSaved();
+    const { type } = useCard();
+    const [showBtn, setShowBtn] = createSignal(true);
 
-    let svg = <Card/>
+    const fsStyle = () => {
+        if (!fullscreen()) return {};
+        const ratio = CARD_RATIO[type()] || 5 / 3;
+        return { '--fs-width': `min(100vw, calc(100vh * ${ratio.toFixed(4)}))` };
+    };
 
-    let timer;
+    let svg = <Card/>;
+    let hideTimer;
+
     onMount(() => {
-        document.onmousemove = () => handleMouseChange();
-        document.onmousedown = () => handleMouseChange();
-        document.onfullscreenchange = () => {
-            if (!document.fullscreenElement)
+        setCardRef(svg);
+
+        const handleActivity = () => {
+            setShowBtn(true);
+            clearTimeout(hideTimer);
+            if (fullscreen()) hideTimer = setTimeout(() => setShowBtn(false), 2000);
+        };
+
+        document.addEventListener('mousemove', handleActivity);
+        document.addEventListener('mousedown', handleActivity);
+        document.addEventListener('touchstart', handleActivity, { passive: true });
+
+        // Handle ESC key or swipe-down exit from browser
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
                 setFullscreen(false);
-        }
+                screen.orientation.unlock();
+            }
+        });
+
+        onCleanup(() => {
+            document.removeEventListener('mousemove', handleActivity);
+            document.removeEventListener('mousedown', handleActivity);
+            document.removeEventListener('touchstart', handleActivity);
+        });
     });
 
-    createEffect(() => {
-        let main = document.getElementById("editor-main");
-        let editor = document.getElementById("editor-editor");
-        let card = document.getElementById("editor-card");
-        if(fullscreen()){
-            document.getElementById("root").requestFullscreen();
-            main.classList.add("fullscreen-main");
-            editor.classList.add("fullscreen-editor");
-            screen.orientation.lock('landscape').catch(e => {}); //Ignore if we are on desktop
-            //If on mobile
-            let input = editor.querySelectorAll("input");
-            for (let i = 0; i < input.length; i++)
-                input[i].disabled = true;
+    // Called directly from click — preserves the browser's user-gesture requirement
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen()
+                .then(() => {
+                    setFullscreen(true);
+                    screen.orientation.lock('landscape').catch(() => {});
+                })
+                .catch(() => {});
         } else {
-            if (!main || !editor || !card)
-                return
-            if (document.fullscreenElement)
-                document.exitFullscreen();
-            main.classList.remove("fullscreen-main");
-            editor.classList.remove("fullscreen-editor");
-            screen.orientation.unlock();
-            //If on mobile
-            let input = editor.querySelectorAll("input");
-            for (let i = 0; i < input.length; i++)
-                input[i].disabled = false;
+            document.exitFullscreen()
+                .then(() => setFullscreen(false))
+                .catch(() => {});
         }
-    });
-
-    function handleMouseChange() {
-        setMouseMoved(true);
-        clearTimeout(timer);
-        timer = setTimeout(() => {setMouseMoved(false)}, 2000);
     }
 
     return (
-        <StyledMain id="editor-main">
-            <StyledEditor id="editor-editor">
-                <Show when={!fullscreen()}>
-                    <StyledPicker>
-                        <Picker id={1} name={'trim'}/>        
-                        <Picker id={2} name={'fill'}/>
-                        <Picker id={3} name={'base'}/>
-                    </StyledPicker>
-                </Show>
-                <StyledCard id="editor-card">
-                    <Card ref={svg}/>
-                </StyledCard>
-                <Show when={!fullscreen()}>
-                    <StyledButton class="button" onClick={() => downloadSVG(svg, state, type)}>Download SVG</StyledButton>
-                </Show>
-            </StyledEditor>
-            <Show when={!fullscreen()}>
-                <Selector/>
-                <StyledFullscreen src={maximize} onclick={() => setFullscreen(true)} alt="maximize"/>
+        <StyledCanvas>
+            <StyledCardWrap class={fullscreen() ? 'fullscreen-editor' : undefined} style={fsStyle()}>
+                <Card ref={svg}/>
+            </StyledCardWrap>
+            <Show when={showBtn()}>
+                <StyledCanvasBtn
+                    onClick={toggleFullscreen}
+                    aria-label={fullscreen() ? 'Exit fullscreen' : 'Enter fullscreen'}
+                    title={fullscreen() ? 'Exit fullscreen' : 'Fullscreen'}
+                >
+                    <Show when={fullscreen()} fallback={<MaximizeIcon/>}>
+                        <MinimizeIcon/>
+                    </Show>
+                </StyledCanvasBtn>
             </Show>
-            <Show when={fullscreen() && mouseMoved()}>
-                <StyledFullscreen src={minimize} onclick={() => setFullscreen(false)} alt="minimize"/>
-            </Show>
-        </StyledMain>
+        </StyledCanvas>
     );
 }
 
